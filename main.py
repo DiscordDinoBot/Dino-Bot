@@ -2,14 +2,19 @@ import os, nextcord, json
 
 from nextcord.ext import commands
 
+'''
+This runs the config JSON file. This will not be included
+on our GitHub Repostiory since it includes the token for our bot.
+'''
+
+#Checks if the JSON file exists.
 if os.path.exists(os.getcwd() + "/config.json"):
   with open("./config.json") as x:
     configData = json.load(x)
 
+#Tells the user if the JSON file does not exist.
 else:
   print("JSON File does not exist!")
-
-  
 
 #Setting the prefix for the bot. "!"
 bot = commands.Bot(command_prefix = "!")
@@ -70,7 +75,6 @@ for filename in os.listdir('./commands'):
 for filename in os.listdir('./commands/study'):
   if filename.endswith('.py'):
     bot.load_extension(f'commands.study.{filename[:-3]}') 
-
 
 #Token from Secret Variable
 bot.run(configData["TOKEN"])

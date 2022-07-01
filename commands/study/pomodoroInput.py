@@ -103,16 +103,16 @@ class PomodoroInput(commands.Cog):
       shortBreak is the short break time.
       longBreak is the long break time.
       '''
-
+      
       #Beginner is selected.
       if (self.values[0] == "Beginner"):
-        pomodoroTime = 63
+        pomodoroTime = 2
         shortBreak = 30
         longBreak = 900
 
       #Intermediate is selected.
       elif (self.values[0] == "Intermediate"):
-        pomodoroTime = 2100
+        pomodoroTime = 1500
         shortBreak = 300
         longBreak = 900
            

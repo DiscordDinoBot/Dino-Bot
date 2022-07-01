@@ -8,7 +8,7 @@ class Version(commands.Cog):
   #Version command that prints the version of the bot to the user.
   @commands.command()
   async def version(self, ctx):
-    await ctx.send("Dino Bot is running on version **0.3.6**") # <--- CHANGE VERSION NUMBER HERE
+    await ctx.send("Dino Bot is running on version **0.3.7**") # <--- CHANGE VERSION NUMBER HERE
 
 #Runs the version function.
 def setup(bot):
