@@ -8,31 +8,32 @@ class PomodoroClock(commands.Cog):
   
   def __init__(self, bot):
     
-    self.bot = bot
+    PomodoroClock.bot = bot
 
     studyDictionary = {}
     breakDictionary = {}
     longBreakDictionary = {}
     sessionState = {}
     pauseState = {}
-    userTitleDictionary = {}
+    finishState = {}
 
     PomodoroClock.studyDictionary = studyDictionary
     PomodoroClock.breakDictionary = breakDictionary
     PomodoroClock.longBreakDictionary = longBreakDictionary
     PomodoroClock.sessionState = sessionState
-    PomodoroClock.userTitleDictionary = userTitleDictionary
     PomodoroClock.pauseState = pauseState
+    PomodoroClock.finishState = finishState
 
 
   
-  async def setPomodoro(self, studyTime, breakTime, longBreakTime, userIdentity, userTitle):
+  async def setPomodoro(self, studyTime, breakTime, longBreakTime, userIdentity):
     
     PomodoroClock.studyDictionary[userIdentity] = studyTime
     PomodoroClock.breakDictionary[userIdentity] = breakTime
     PomodoroClock.longBreakDictionary[userIdentity] = longBreakTime
     PomodoroClock.sessionState[userIdentity] = 0
-    PomodoroClock.userTitleDictionary[userIdentity] = userTitle
+    PomodoroClock.pauseState[userIdentity] = False
+    PomodoroClock.finishState[userIdentity] = False
 
   
   
@@ -152,6 +153,16 @@ class PomodoroClock(commands.Cog):
   
   async def getStudyTime(self, userIdentity):
     return PomodoroClock.studyDictionary[userIdentity]
+  
+  
+
+  async def getBreakTime(self, userIdentity):
+    return PomodoroClock.breakDictionary[userIdentity]
+  
+
+
+  async def getLongBreakTime(self, userIdentity):
+    return PomodoroClock.longBreakDictionary[userIdentity]
 
 
 
@@ -161,8 +172,8 @@ class PomodoroClock(commands.Cog):
 
   
   async def responsePauseButton(self):
-    await PomodoroClock.displayMessage.delete()
-    PomodoroClock.clockPause = True
+    PomodoroClock.pauseState[self.user.id] = True
+    print(PomodoroClock.pauseState)
     print("Done")
 
 
@@ -178,26 +189,50 @@ class PomodoroClock(commands.Cog):
 
   
   async def controlPomodoro(self, ctx, userIdentity):
+    #Checks if user has paused the session
+    if (PomodoroClock.pauseState[userIdentity] == True):
+      await PomodoroClock.pausePomodoro(self, ctx, userIdentity)
 
-    timeSeconds = await PomodoroClock.getStudyTime(self, userIdentity)
-    await PomodoroClock.clockPomodoro(self, ctx, userIdentity, timeSeconds)
+
+    #Checks if user has finished the session
+    elif (PomodoroClock.finishState[userIdentity] == True):
+      await PomodoroClock.finishPomodoro(self, ctx, userIdentity)
     
+
+    #Checks if the user wants to run a study session
+    elif (PomodoroClock.sessionState[userIdentity]) in (0, 2, 4, 6):
+      timeSeconds = await PomodoroClock.getStudyTime(self, userIdentity)
+      await PomodoroClock.clockPomodoro(self, ctx, userIdentity, timeSeconds)
+    
+
+    #Checks if user wants to run a break session
+    elif (PomodoroClock.sessionState[userIdentity]) in (1, 3, 5):
+      timeSeconds = await PomodoroClock.getBreakTime(self, userIdentity)
+      await PomodoroClock.clockPomodoro(self, ctx, userIdentity, timeSeconds)
+
+
+    #Checks if user wants to run a long break session
+    elif (PomodoroClock.sessionState[userIdentity]) == 7:
+      timeSeconds = await PomodoroClock.getLongBreakTime(self, userIdentity)
+      await PomodoroClock.clockPomodoro(self, ctx, userIdentity, timeSeconds)
+
+  
 
 
   async def clockPomodoro(self, ctx, userIdentity, timeSeconds):
-    PomodoroClock.clockPause = False
-
+    #Gets all the information for the initial display message
     red, green, blue = await PomodoroClock.getDisplayColour(self, userIdentity) 
     displayTitle = await PomodoroClock.getDisplayTitle(self, userIdentity)
     displayDescription = await PomodoroClock.getDisplayDescription(self, timeSeconds)
     
-  
+    #Sets the initial embed message with the variables we recieved above
     embed = nextcord.Embed(title = (f"{displayTitle} Session"), description = (displayDescription), colour = nextcord.Colour.from_rgb(red, green, blue))
+    #Sends the initial display message and assigns it to a variable so we can edit it in the next loop
     displayMessage = await ctx.send(view=self.activeSessionButtons, embed=embed)
 
     whileStartTime = time.time()
     
-    while (timeSeconds > 0) and (PomodoroClock.clockPause == False):
+    while (timeSeconds > 0) and (PomodoroClock.pauseState[userIdentity] == False) and (PomodoroClock.finishState[userIdentity] == False):
   
       loopStartTime = time.time()
 
@@ -219,11 +254,24 @@ class PomodoroClock(commands.Cog):
     print(whileEndTime - whileStartTime)
 
     await displayMessage.delete()
-    await self.setSessionState(userIdentity)
-    await self.controlPomodoro(ctx, userIdentity)
+
+    if (timeSeconds <= 0):
+      await PomodoroClock.setSessionState(self, userIdentity)
+    
+    await PomodoroClock.controlPomodoro(self, ctx, userIdentity)
 
 
-  
+
+  async def pausePomodoro(self, ctx, userIdentity):
+    await ctx.send(f"This is the paused message for {userIdentity}")
+
+
+
+  async def finishPomodoro(self, ctx, userIdentity):
+    await ctx.send(f"You have finished your Pomodoro session for {userIdentity}")
+
+
+
   async def runPomodoro(self, ctx, userIdentity):
     await self.setButtons()
     await self.controlPomodoro(ctx, userIdentity)
