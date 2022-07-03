@@ -5,6 +5,9 @@ from nextcord.ext import commands
 '''
 This runs the config JSON file. This will not be included
 on our GitHub Repostiory since it includes the token for our bot.
+
+Once you run this file it will create the config.json file for you.
+You will need to enter your bot token into the "" of the file.
 '''
 
 #Checks if the JSON file exists.
@@ -12,9 +15,14 @@ if os.path.exists(os.getcwd() + "/config.json"):
   with open("./config.json") as x:
     configData = json.load(x)
 
-#Tells the user if the JSON file does not exist.
+#Creates the JSON file in the format for the developer.
 else:
-  print("JSON File does not exist!")
+  #Template for the JSON file.
+  configTemplate = {"TOKEN": ""} #INSERT TOKEN INSIDE ""
+  
+  #Creates the file and sets it to the same layout as our code.
+  with open(os.getcwd() + "/config.json", "w+") as x:
+    json.dump(configTemplate, x)
 
 #Setting the prefix for the bot. "!"
 bot = commands.Bot(command_prefix = "!")
@@ -30,7 +38,7 @@ async def on_ready():
   #Status for the bot.
   await bot.change_presence(status=nextcord.Status.online, activity=nextcord.Activity(type=nextcord.ActivityType.listening, name="!study"))
 
-  
+
 #Loads a specific cog.
 @bot.command()
 #Checks if the user is a owner.

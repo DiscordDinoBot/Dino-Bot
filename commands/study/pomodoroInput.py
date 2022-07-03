@@ -11,10 +11,10 @@ class PomodoroInput(commands.Cog):
     PomodoroInput.pomodoroClockFile = PomodoroClock(bot)
 
     sessionActive = {}
-    selectionMenuActive = {}
+    selectionMenuMessage = {}
 
     PomodoroInput.sessionActive = sessionActive
-    PomodoroInput.selectionMenuActive = selectionMenuActive
+    PomodoroInput.selectionMenuMessage = selectionMenuMessage
   
   #Study command that will run the Selection Menu.
   @commands.command()
@@ -25,11 +25,9 @@ class PomodoroInput(commands.Cog):
       if PomodoroInput.sessionActive[ctx.author.id] == True:
         await ctx.author.send("You currently have an active session. Please finish that one before starting another.")
         return
-    
-    PomodoroInput.sessionActive[ctx.author.id] = True
-    PomodoroInput.selectionMenuActive[ctx.author.id] = True
 
-    PomodoroInput.selectionMenuMessage = await ctx.send("Choose a selection menu!" , view = DropdownView())
+    PomodoroInput.sessionActive[ctx.author.id] = True
+    PomodoroInput.selectionMenuMessage[ctx.author.id] = await ctx.author.send("Please choose a selection" , view = DropdownView())
 
 
 #Inner class that will run the view for the menu.
@@ -39,7 +37,7 @@ class DropdownView(nextcord.ui.View):
     placeholder='Select a studying time.', 
     min_values=1, 
     max_values=1,
-    
+  
     options = [
 
         #BEGINNER
@@ -93,8 +91,6 @@ class DropdownView(nextcord.ui.View):
 
   #This is the callback function that will run once the selection has been made from the user.
   async def callback(self, select, interaction: nextcord.Interaction):
-    
-    PomodoroInput.selectionMenuActive[interaction.user.id] = False
 
     '''
     All the following variables are in seconds.
@@ -106,13 +102,13 @@ class DropdownView(nextcord.ui.View):
     
     #Beginner is selected.
     if (select.values[0] == "Beginner"):
-      pomodoroTime = 2
-      shortBreak = 5
-      longBreak = 10
+      pomodoroTime = 900
+      shortBreak = 300
+      longBreak = 900
 
     #Intermediate is selected.
     elif (select.values[0] == "Intermediate"):
-      pomodoroTime = 1500
+      pomodoroTime = 2100
       shortBreak = 300
       longBreak = 900
         
@@ -140,23 +136,18 @@ class DropdownView(nextcord.ui.View):
       '''
 
       PomodoroInput.sessionActive[interaction.user.id] = False
-      PomodoroInput.selectionMenuActive[interaction.user.id] = False
       
       #This are currently here so the function stops. Remove them once the custom menu is made.
-      await PomodoroInput.selectionMenuMessage.delete()
+      #await PomodoroInput.selectionMenuMessage.delete()
       await interaction.send("**Custom** is currently in development. Please pick another option.")
       return
 
-    if PomodoroInput.selectionMenuActive[interaction.user.id] == False:
-      #Deletes the selection menu once the option has been choosed.
-      await PomodoroInput.selectionMenuMessage.delete()
-      pass
-          
+
+    await PomodoroInput.selectionMenuMessage[interaction.user.id].delete()
+    
     #This will run the cancel selection for the menu.
     if (select.values[0] == 'Cancel'):
-      #Runs the verifcation function that will remove the user from the active list
       PomodoroInput.sessionActive[interaction.user.id] = False
-      PomodoroInput.selectionMenuActive[interaction.user.id] = False
     
     #Redirects any other selections to the control file.
     else:

@@ -232,10 +232,10 @@ class PomodoroClock(commands.Cog):
 
     whileStartTime = time.time()
     
-    while (timeSeconds > 0) and (PomodoroClock.pauseState[userIdentity] == False) and (PomodoroClock.finishState[userIdentity] == False):
+    while (timeSeconds > 0):
   
       loopStartTime = time.time()
-
+      
       if ((timeSeconds % 60) == 0):
         red, green, blue = await PomodoroClock.getDisplayColour(self, userIdentity) 
         displayTitle = await PomodoroClock.getDisplayTitle(self, userIdentity)
@@ -247,7 +247,6 @@ class PomodoroClock(commands.Cog):
       timeSeconds -= 1
         
       loopEndTime = time.time()
-      
       await asyncio.sleep(1 - (loopEndTime - loopStartTime))
 
     whileEndTime = time.time()
