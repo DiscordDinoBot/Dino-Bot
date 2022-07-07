@@ -102,9 +102,9 @@ class DropdownView(nextcord.ui.View):
     
     #Beginner is selected.
     if (select.values[0] == "Beginner"):
-      pomodoroTime = 10
-      shortBreak = 300
-      longBreak = 900
+      pomodoroTime = 6
+      shortBreak = 2
+      longBreak = 2
 
     #Intermediate is selected.
     elif (select.values[0] == "Intermediate"):

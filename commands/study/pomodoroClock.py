@@ -20,6 +20,7 @@ class PomodoroClock(commands.Cog):
     timeRemaining = {}
     resumeState = {}
     pauseMessage = {}
+    timeStudied = {}
 
     PomodoroClock.studyDictionary = studyDictionary
     PomodoroClock.breakDictionary = breakDictionary
@@ -31,6 +32,7 @@ class PomodoroClock(commands.Cog):
     PomodoroClock.timeRemaining = timeRemaining
     PomodoroClock.pauseMessage = pauseMessage
     PomodoroClock.resumeState = resumeState
+    PomodoroClock.timeStudied = timeStudied
 
 
   
@@ -45,6 +47,8 @@ class PomodoroClock(commands.Cog):
     PomodoroClock.finishState[userIdentity] = False
     PomodoroClock.resumeState[userIdentity] = False
     PomodoroClock.timeRemaining[userIdentity] = 1
+    PomodoroClock.timeStudied[userIdentity] =  0
+
 
   
   
@@ -102,9 +106,9 @@ class PomodoroClock(commands.Cog):
   
   async def getDisplayDescription(self, remainingSeconds):
 
-    totalMinute = math.ceil(remainingSeconds / 60)
-    
-    totalHour = math.trunc(totalMinute / 60)
+    totalMinute = math.floor((((remainingSeconds / 60) / 60) % 1) * 60)
+        
+    totalHour = math.trunc((remainingSeconds / 60) / 60)
 
     #Possibility 1: Multiple hours left.
     if ((totalMinute % 60) == 0) and (totalMinute != 60):
@@ -141,7 +145,128 @@ class PomodoroClock(commands.Cog):
     return displayDescription
 
 
-  
+
+  async def getFinishDisplayDescription(self, totalTime):
+
+    totalSecond = math.trunc(round(((totalTime / 60) % 1) * 60))
+
+    totalMinute = math.trunc((((totalTime / 60) / 60) % 1) * 60)
+        
+    totalHour = math.trunc((totalTime / 60) / 60)
+
+    #Possibility 1: Multiple hours, multiple minutes and multiple seconds finished.
+    if (totalHour > 1) and (totalMinute > 1) and (totalSecond > 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hours, {totalMinute} minutes and {totalSecond} seconds** of studying.")
+
+    #Possibility 2: Multiple hours, multiple minutes and one second finished.
+    elif (totalHour > 1) and (totalMinute > 1) and (totalSecond == 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hours, {totalMinute} minutes and {totalSecond} second** of studying.")
+
+    #Possibility 3: Multiple hours, one minute and multiple seconds finished.
+    elif (totalHour > 1) and (totalMinute == 1) and (totalSecond > 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hours, {totalMinute} minute and {totalSecond} seconds** of studying.")
+
+    #Possibility 4: Multiple hours, one minute and one second finished.
+    elif (totalHour > 1) and (totalMinute == 1) and (totalSecond == 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hours, {totalMinute} minute and {totalSecond} second** of studying.")
+
+    #Possibility 5: One hour, multiple minutes and multiple seconds finished.
+    elif (totalHour == 1) and (totalMinute > 1) and (totalSecond > 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hour, {totalMinute} minutes and {totalSecond} seconds** of studying.")
+
+    #Possibility 6: One hour, multiple minutes and one second finished.
+    elif (totalHour == 1) and (totalMinute > 1) and (totalSecond == 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hour, {totalMinute} minutes and {totalSecond} second** of studying.")
+    
+    #Possibility 7: One hour, one minute and multiple seconds finished.
+    elif (totalHour == 1) and (totalMinute == 1) and (totalSecond > 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hour, {totalMinute} minute and {totalSecond} seconds** of studying.")
+
+    #Possibility 8: One hour, one minute and one second finished.
+    elif (totalHour == 1) and (totalMinute == 1) and (totalSecond == 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hour, {totalMinute} minute and {totalSecond} second** of studying.")
+    
+    #Possibility 9: Multiple hours and multiple minutes finished.
+    elif (totalHour > 1) and (totalMinute > 1) and (totalSecond < 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hours and {totalMinute} minutes** of studying.")
+
+    #Possibility 10: Multiple hours and one minute finished.
+    elif (totalHour > 1) and (totalMinute == 1) and (totalSecond < 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hours and {totalMinute} minute** of studying.")
+    
+    #Possibility 11: One hour and multiple minutes finished.
+    elif (totalHour == 1) and (totalMinute > 1) and (totalSecond < 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hour and {totalMinute} minutes** of studying.")
+    
+    #Possibility 12: One hour and one minute finished.
+    elif (totalHour == 1) and (totalMinute == 1) and (totalSecond < 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hour and {totalMinute} minute** of studying.")
+    
+    #Possibility 13: Multiple hours and multiple seconds finished.
+    elif (totalHour > 1) and (totalMinute < 1) and (totalSecond > 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hours and {totalSecond} seconds** of studying.")
+
+    #Possibility 14: Multiple hours and one second finished.
+    elif (totalHour > 1) and (totalMinute < 1) and (totalSecond == 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hours and {totalSecond} second** of studying.")
+    
+    #Possibility 15: One hour and multiple seconds finished.
+    elif (totalHour == 1) and (totalMinute < 1) and (totalSecond > 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hour and {totalSecond} seconds** of studying.")
+
+    #Possibility 16: One hour and one second finished.
+    elif (totalHour == 1) and (totalMinute < 1) and (totalSecond == 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hour and {totalSecond} second** of studying.")
+
+    #Possibility 17: Multiple minutes and multiple seconds finished.
+    elif (totalHour < 1) and (totalMinute > 1) and (totalSecond > 1):
+      finishDisplayDescription = (f"You completed **{totalMinute} minutes and {totalSecond} seconds** of studying.")
+    
+    #Possibility 18: Multiple minutes and one second finished.
+    elif (totalHour < 1) and (totalMinute > 1) and (totalSecond == 1):
+      finishDisplayDescription = (f"You completed **{totalMinute} minutes and {totalSecond} second** of studying.")
+    
+    #Possibility 19: One minute and multiple seconds finished.
+    elif (totalHour < 1) and (totalMinute == 1) and (totalSecond > 1):
+      finishDisplayDescription = (f"You completed **{totalMinute} minute and {totalSecond} seconds** of studying.")
+    
+    #Possibility 20: One minute and one second finished.
+    elif (totalHour < 1) and (totalMinute == 1) and (totalSecond == 1):
+      finishDisplayDescription = (f"You completed **{totalMinute} minute and {totalSecond} second** of studying.")
+    
+    #Possibility 21: Multiple hours.
+    elif (totalHour > 1) and (totalMinute < 1) and (totalSecond < 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hours** of studying.")
+    
+    #Possibility 22: One hour.
+    elif (totalHour == 1) and (totalMinute < 1) and (totalSecond < 1):
+      finishDisplayDescription = (f"You completed **{totalHour} hour** of studying.")
+    
+    #Possibility 23: Multiple minutes.
+    elif (totalHour < 1) and (totalMinute > 1) and (totalSecond < 1):
+      finishDisplayDescription = (f"You completed **{totalMinute} minutes** of studying.")
+    
+    #Possibility 24: One minute.
+    elif (totalHour < 1) and (totalMinute == 1) and (totalSecond < 1):
+      finishDisplayDescription = (f"You completed **{totalMinute} minute** of studying.")
+    
+    #Possibility 25: Multiple seconds.
+    elif (totalHour < 1) and (totalMinute < 1) and (totalSecond > 1):
+      finishDisplayDescription = (f"You completed **{totalSecond} seconds** of studying.")
+
+    #Possibility 26: One second.
+    elif (totalHour < 1) and (totalMinute < 1) and (totalSecond == 1):
+      finishDisplayDescription = (f"You completed **{totalSecond} second** of studying.")
+
+    #Possibility 27: Zero seconds.
+    elif (totalHour < 1) and (totalMinute < 1) and (totalSecond < 1):
+      finishDisplayDescription = (f"You completed **0 seconds** of studying.")
+
+
+    return finishDisplayDescription
+
+
+
   async def getDisplayColour(self, userIdentity):
     if (PomodoroClock.sessionState[userIdentity] == 7):
       red = 8
@@ -267,6 +392,8 @@ class PomodoroClock(commands.Cog):
     #Sends the initial display message and assigns it to a variable so we can edit it in the next loop
     displayMessage = await user.send(view=PomodoroClock.activeSessionButtons, embed=embed)
 
+    initialSeconds = timeSeconds
+
     whileStartTime = time.time()
     
     while (timeSeconds > 0) and (PomodoroClock.pauseState[userIdentity] == False) and (PomodoroClock.finishState[userIdentity] == False) and (PomodoroClock.skipState[userIdentity] == False):
@@ -288,6 +415,11 @@ class PomodoroClock(commands.Cog):
     whileEndTime = time.time()
     print(whileEndTime - whileStartTime)
 
+
+    if(PomodoroClock.sessionState[userIdentity]) in (0, 2, 4, 6):
+      timeStudied = initialSeconds - timeSeconds
+      PomodoroClock.timeStudied[userIdentity] += timeStudied
+
     await PomodoroClock.setTimeRemaining(self, userIdentity, timeSeconds)
 
     await displayMessage.delete()
@@ -305,7 +437,16 @@ class PomodoroClock(commands.Cog):
 
 
   async def finishPomodoro(self, user, userIdentity):
-    await user.send(f"You have finished your Pomodoro session for {userIdentity}")
+
+    print(PomodoroClock.timeStudied[userIdentity])
+    
+    timeSeconds = PomodoroClock.timeStudied[userIdentity]
+
+    finishDisplayDescription = await PomodoroClock.getFinishDisplayDescription(self, timeSeconds)
+
+    embed = nextcord.Embed(title = ("Finished Session"), description = (finishDisplayDescription), colour = nextcord.Colour.from_rgb(74, 189, 100))
+
+    await user.send(embed=embed)
 
 
 
