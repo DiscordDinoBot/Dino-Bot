@@ -3,6 +3,8 @@ from nextcord import ButtonStyle
 from nextcord.ui import Button, View
 from nextcord.ext import commands
 
+from datetime import date
+
 
 class PomodoroClock(commands.Cog):
   
@@ -105,10 +107,10 @@ class PomodoroClock(commands.Cog):
 
   
   async def getDisplayDescription(self, remainingSeconds):
+    
+    totalMinute = divmod(remainingSeconds, 60)[0]
 
-    totalMinute = math.floor((((remainingSeconds / 60) / 60) % 1) * 60)
-        
-    totalHour = math.trunc((remainingSeconds / 60) / 60)
+    totalHour, totalMinute = divmod(totalMinute, 60)
 
     #Possibility 1: Multiple hours left.
     if ((totalMinute % 60) == 0) and (totalMinute != 60):
@@ -148,11 +150,9 @@ class PomodoroClock(commands.Cog):
 
   async def getFinishDisplayDescription(self, totalTime):
 
-    totalSecond = math.trunc(round(((totalTime / 60) % 1) * 60))
+    totalMinute, totalSecond = divmod(totalTime, 60)
 
-    totalMinute = math.trunc((((totalTime / 60) / 60) % 1) * 60)
-        
-    totalHour = math.trunc((totalTime / 60) / 60)
+    totalHour, totalMinute = divmod(totalMinute, 60)
 
     #Possibility 1: Multiple hours, multiple minutes and multiple seconds finished.
     if (totalHour > 1) and (totalMinute > 1) and (totalSecond > 1):
@@ -261,7 +261,6 @@ class PomodoroClock(commands.Cog):
     #Possibility 27: Zero seconds.
     elif (totalHour < 1) and (totalMinute < 1) and (totalSecond < 1):
       finishDisplayDescription = (f"You completed **0 seconds** of studying.")
-
 
     return finishDisplayDescription
 
@@ -437,17 +436,17 @@ class PomodoroClock(commands.Cog):
 
 
   async def finishPomodoro(self, user, userIdentity):
-
-    print(PomodoroClock.timeStudied[userIdentity])
     
     timeSeconds = PomodoroClock.timeStudied[userIdentity]
-
     finishDisplayDescription = await PomodoroClock.getFinishDisplayDescription(self, timeSeconds)
+    studyDate = date.today()
 
-    embed = nextcord.Embed(title = ("Finished Session"), description = (finishDisplayDescription), colour = nextcord.Colour.from_rgb(74, 189, 100))
+    embed = nextcord.Embed(title = (f"Finished Session ({studyDate})"), description = (finishDisplayDescription), colour = nextcord.Colour.from_rgb(74, 189, 100))
+
+    from .pomodoroInput import PomodoroInput
+    PomodoroInput.sessionActive[userIdentity] = False
 
     await user.send(embed=embed)
-
 
 
   async def runPomodoro(self, user, userIdentity):
