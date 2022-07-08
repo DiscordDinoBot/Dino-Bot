@@ -2,6 +2,7 @@ import nextcord
 from nextcord.ext import commands
 
 from .pomodoroClock import PomodoroClock
+from .pomodoroCustomInput import PomodoroCustomInput
 
 #Class that takes in the input from Selection Menu for the bot.
 class PomodoroInput(commands.Cog):
@@ -9,6 +10,7 @@ class PomodoroInput(commands.Cog):
     
     PomodoroInput.bot = bot
     PomodoroInput.pomodoroClockFile = PomodoroClock(bot)
+    PomodoroInput.pomodoroCustomInputFile = PomodoroCustomInput(bot)
 
     sessionActive = {}
     selectionMenuMessage = {}
@@ -30,7 +32,6 @@ class PomodoroInput(commands.Cog):
     PomodoroInput.selectionMenuMessage[ctx.author.id] = await ctx.author.send("Please choose a selection" , view = DropdownView())
 
 
-#Inner class that will run the view for the menu.
 class DropdownView(nextcord.ui.View):
   @nextcord.ui.select(
 
@@ -124,31 +125,16 @@ class DropdownView(nextcord.ui.View):
       shortBreak = 300
       longBreak = 900
     
-    #Custom is selected.
-    elif (select.values[0] == "Custom"):
-
-      '''
-      Nothing in here yet. Planning on putting another selection menu
-      that the user can use to select custom times for the session.
-
-      Currently this will remove the user id from the active list so the user is not
-      locked out of making another session
-      '''
-
-      PomodoroInput.sessionActive[interaction.user.id] = False
-      
-      #This are currently here so the function stops. Remove them once the custom menu is made.
-      #await PomodoroInput.selectionMenuMessage.delete()
-      await interaction.send("**Custom** is currently in development. Please pick another option.")
-      return
-
-
     await PomodoroInput.selectionMenuMessage[interaction.user.id].delete()
     
     #This will run the cancel selection for the menu.
     if (select.values[0] == 'Cancel'):
       PomodoroInput.sessionActive[interaction.user.id] = False
     
+    #Custom is selected.
+    elif (select.values[0] == "Custom"):
+      await PomodoroInput.pomodoroCustomInputFile.pomodoroStudyCustomInput(interaction.user, interaction.user.id)
+
     #Redirects any other selections to the control file.
     else:
       await PomodoroInput.pomodoroClockFile.setPomodoro(pomodoroTime, shortBreak, longBreak, interaction.user.id)

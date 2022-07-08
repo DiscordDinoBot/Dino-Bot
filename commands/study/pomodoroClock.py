@@ -415,7 +415,7 @@ class PomodoroClock(commands.Cog):
     print(whileEndTime - whileStartTime)
 
 
-    if(PomodoroClock.sessionState[userIdentity]) in (0, 2, 4, 6):
+    if (PomodoroClock.sessionState[userIdentity]) in (0, 2, 4, 6):
       timeStudied = initialSeconds - timeSeconds
       PomodoroClock.timeStudied[userIdentity] += timeStudied
 
@@ -442,7 +442,7 @@ class PomodoroClock(commands.Cog):
     studyDate = date.today()
 
     embed = nextcord.Embed(title = (f"Finished Session ({studyDate})"), description = (finishDisplayDescription), colour = nextcord.Colour.from_rgb(74, 189, 100))
-
+    
     from .pomodoroInput import PomodoroInput
     PomodoroInput.sessionActive[userIdentity] = False
 
