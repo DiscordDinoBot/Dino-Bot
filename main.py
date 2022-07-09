@@ -2,6 +2,9 @@ import os, nextcord, json
 
 from nextcord.ext import commands
 
+intents = nextcord.Intents.default()
+intents.message_content = True
+
 '''
 This runs the config JSON file. This will not be included
 on our GitHub Repostiory since it includes the token for our bot.
@@ -25,7 +28,7 @@ else:
     json.dump(configTemplate, x)
 
 #Setting the prefix for the bot. "!"
-bot = commands.Bot(command_prefix = "!")
+bot = commands.Bot(command_prefix = "!", intents=intents)
 
 #Removes default help command so we can access our own custom one.
 bot.remove_command('help')
