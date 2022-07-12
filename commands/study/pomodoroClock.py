@@ -404,7 +404,7 @@ class PomodoroClock(commands.Cog):
         
         embed = nextcord.Embed(title = (f"{displayTitle} Session"), description = (displayDescription), colour = nextcord.Colour.from_rgb(red, green, blue))
         await displayMessage.edit(view=PomodoroClock.activeSessionButtons, embed=embed)
-        await asyncio.sleep(0.815) #Estimated to how long the loop takes to run
+        await asyncio.sleep(0.835) #Estimated to how long the loop takes to run
         timeSeconds -= 1
       
       else:
