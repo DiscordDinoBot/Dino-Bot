@@ -30,12 +30,20 @@ class PomodoroInput(commands.Cog):
     #Trying to remove a selection menu.
     try:
       await PomodoroInput.selectionMenuMessage[self.user.id].delete()
-    
+
     #No menu is active, therefore we pass it.
     except nextcord.errors.NotFound:
       pass
+
+    #Trying to remove a pause message.
+    try:
+      await PomodoroClock.pauseMessage[self.user.id].delete()
+
+    #No pause message, therefore we pass it.
+    except (nextcord.errors.NotFound, KeyError):
+      pass
     
-    embed = nextcord.Embed(description = ("Your session has **Stopped**. You can began a new one."), colour = nextcord.Colour.from_rgb(209, 65, 65))
+    embed = nextcord.Embed(description = ("Your session has **Stopped**. You can begin a new one."), colour = nextcord.Colour.from_rgb(209, 65, 65))
     await PomodoroInput.removeMessage[self.user.id].edit(embed=embed, view=View())
 
 
@@ -146,7 +154,7 @@ class DropdownView(nextcord.ui.View):
     
     #Beginner is selected.
     if (select.values[0] == "Beginner"):
-      pomodoroTime = 900
+      pomodoroTime = 60
       shortBreak = 300
       longBreak = 900
 

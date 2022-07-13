@@ -1,8 +1,7 @@
-import nextcord, math, time, asyncio
+import nextcord, time, asyncio
 from nextcord import ButtonStyle
 from nextcord.ui import Button, View
 from nextcord.ext import commands
-
 from datetime import date
 
 
@@ -378,7 +377,6 @@ class PomodoroClock(commands.Cog):
 
   
 
-
   async def clockPomodoro(self, user, userIdentity, timeSeconds):
 
     #Gets all the information for the initial display message
@@ -393,9 +391,8 @@ class PomodoroClock(commands.Cog):
 
     initialSeconds = timeSeconds
 
-    whileStartTime = time.time()
-    
     while (timeSeconds > 0) and (PomodoroClock.pauseState[userIdentity] == False) and (PomodoroClock.finishState[userIdentity] == False) and (PomodoroClock.skipState[userIdentity] == False):
+      await asyncio.sleep(1)
 
       if ((timeSeconds % 60) == 0):
         red, green, blue = await PomodoroClock.getDisplayColour(self, userIdentity) 
@@ -404,16 +401,9 @@ class PomodoroClock(commands.Cog):
         
         embed = nextcord.Embed(title = (f"{displayTitle} Session"), description = (displayDescription), colour = nextcord.Colour.from_rgb(red, green, blue))
         await displayMessage.edit(view=PomodoroClock.activeSessionButtons, embed=embed)
-        await asyncio.sleep(0.835) #Estimated to how long the loop takes to run
-        timeSeconds -= 1
-      
-      else:
-        await asyncio.sleep(0.995) #Estimated to how long the loop takes to run
-        timeSeconds -= 1
-    
-    whileEndTime = time.time()
-    print(whileEndTime - whileStartTime)
 
+      timeSeconds -= 1
+    
 
     if (PomodoroClock.sessionState[userIdentity]) in (0, 2, 4, 6):
       timeStudied = initialSeconds - timeSeconds
