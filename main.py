@@ -21,7 +21,7 @@ if os.path.exists(os.getcwd() + "/config.json"):
 #Creates the JSON file in the format for the developer.
 else:
   #Template for the JSON file.
-  configTemplate = {"TOKEN": ""} #INSERT TOKEN INSIDE ""
+  configTemplate = {"TOKEN": ""} #INSERT TOKEN INSIDE "" (config.json)
   
   #Creates the file and sets it to the same layout as our code.
   with open(os.getcwd() + "/config.json", "w+") as x:
@@ -82,10 +82,21 @@ for filename in os.listdir('./commands'):
     #This will strip the last three characters from the files (.py)
     bot.load_extension(f'commands.{filename[:-3]}')
 
+#When the bot turns on this will load all the files in the helpers folder.
+for filename in os.listdir('./helpers'):
+  if filename.endswith('.py'):
+    bot.load_extension(f'helpers.{filename[:-3]}')
+
 #When the bot turns on this will load all the study files in the commands/study folder.
 for filename in os.listdir('./commands/study'):
   if filename.endswith('.py'):
-    bot.load_extension(f'commands.study.{filename[:-3]}') 
+    bot.load_extension(f'commands.study.{filename[:-3]}')
+
+#When the bot turns on this will load all the timer files in the commands/timer folder.
+for filename in os.listdir('./commands/timer'):
+  if filename.endswith('.py'):
+    bot.load_extension(f'commands.timer.{filename[:-3]}') 
+
 
 #Token from Secret Variable
 bot.run(configData["TOKEN"])

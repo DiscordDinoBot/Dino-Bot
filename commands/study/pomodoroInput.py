@@ -1,4 +1,4 @@
-import nextcord, asyncio
+import nextcord
 from nextcord.ext import commands
 from nextcord import ButtonStyle
 from nextcord.ui import Button, View
@@ -23,7 +23,7 @@ class PomodoroInput(commands.Cog):
     PomodoroInput.selectionMenuMessage = selectionMenuMessage
 
   
-  async def responseRemoveButton(self):
+  async def responseEndButton(self):
     PomodoroClock.finishState[self.user.id] = True
     PomodoroInput.sessionActive[self.user.id] = False
 
@@ -38,6 +38,9 @@ class PomodoroInput(commands.Cog):
     #Trying to remove a pause message.
     try:
       await PomodoroClock.pauseMessage[self.user.id].delete()
+
+      #Since pause message is outside of the clock function we need to manually finish the session.
+      await PomodoroClock.finishPomodoro(self, self.user, self.user.id)
 
     #No pause message, therefore we pass it.
     except (nextcord.errors.NotFound, KeyError):
@@ -54,16 +57,16 @@ class PomodoroInput(commands.Cog):
 
   async def setButtons():
     continueButton = Button(label="Continue Session", style = ButtonStyle.green)
-    removeButton = Button(label="Remove Session", style = ButtonStyle.red)
+    endButton = Button(label="End Session", style = ButtonStyle.red)
     
     #Button View for any paused sessions.
     PomodoroInput.SessionButtons = View()
     PomodoroInput.SessionButtons.add_item(continueButton)
-    PomodoroInput.SessionButtons.add_item(removeButton)
+    PomodoroInput.SessionButtons.add_item(endButton)
     
     #Response functions.
     continueButton.callback = PomodoroInput.responseContinueButton
-    removeButton.callback = PomodoroInput.responseRemoveButton
+    endButton.callback = PomodoroInput.responseEndButton
 
   
   #Study command that will run the Selection Menu.
@@ -75,7 +78,7 @@ class PomodoroInput(commands.Cog):
       await PomodoroInput.setButtons()
 
       if PomodoroInput.sessionActive[ctx.author.id] == True:
-        embed = nextcord.Embed(description = ("You currently have an active session. Do you wish to **end** that session?"), colour = nextcord.Colour.from_rgb(209, 65, 65))
+        embed = nextcord.Embed(description = ("You currently have an **active session.**"), colour = nextcord.Colour.from_rgb(209, 65, 65))
         PomodoroInput.removeMessage[ctx.author.id] = await ctx.author.send(view = PomodoroInput.SessionButtons, embed = embed)
         return
 
