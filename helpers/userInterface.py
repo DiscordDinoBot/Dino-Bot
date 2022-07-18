@@ -2,13 +2,13 @@ import nextcord
 from nextcord.ext import commands
 
 
-class Buttons(commands.Cog):
+class UserInterface(commands.Cog):
     def __init__(self, bot):
 
         self.bot = bot
 
-    # INSERT ALL BUTTONS FOR THE BOT
+    # INSERT ALL UI FOR THE BOT
 
 
 def setup(bot):
-    bot.add_cog(Buttons(bot))
+    bot.add_cog(UserInterface(bot))

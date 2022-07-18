@@ -1,26 +1,21 @@
 import nextcord
 from nextcord.ext import commands
 
-from commands.study.pomodoroClock import PomodoroClock
-from commands.study.pomodoroCustomInput import PomodoroCustomInput
-from commands.study.pomodoroInput import PomodoroInput
-
 
 class Verification(commands.Cog):
     def __init__(self, bot):
-    
         self.bot = bot
-
         Verification.sessionActive = {}
-        
-        Verification.pomodoroClockFile = PomodoroClock(bot)
-        Verification.pomodoroCustomInputFile = PomodoroCustomInput(bot)
-        Verification.pomodoroInputFile = PomodoroInput(bot)
+
+    def addUserVerification(userIdentity):
+        Verification.sessionActive[userIdentity] = True
+
+    def removeUserVerification(userIdentity):
+        del Verification.sessionActive[userIdentity]
+
+    # INSERT ALL VERIFICATION ASPECTS TO THE BOT
 
 
-    #INSERT ALL VERIFICATION ASPECTS TO THE BOT
-
-
-#Setup function.
+# Setup function.
 def setup(bot):
-  bot.add_cog(Verification(bot))
+    bot.add_cog(Verification(bot))
