@@ -4,12 +4,17 @@ import json
 
 from nextcord.ext import commands
 
+intents = nextcord.Intents.all()
+intents.message_content = True
+
 '''
 This runs the config JSON file. This will not be included
 on our GitHub Repostiory since it includes the token for our bot.
 
 Once you run this file it will create the config.json file for you.
 You will need to enter your bot token into the "" of the file.
+
+All the code is open to anyone and can be used in your own projects :)
 '''
 
 # Checks if the JSON file exists.
@@ -27,14 +32,13 @@ else:
         json.dump(configTemplate, x)
 
 # Setting the prefix for the bot. "!"
-bot = commands.Bot(command_prefix="!")
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Removes default help command so we can access our own custom one.
 bot.remove_command('help')
 
+
 # This will run once the bot is booted up.
-
-
 @bot.event
 async def on_ready():
     # Prints to console telling us that it is logged in.
@@ -96,7 +100,6 @@ for filename in os.listdir('./commands/study'):
 for filename in os.listdir('./commands/timer'):
     if filename.endswith('.py'):
         bot.load_extension(f'commands.timer.{filename[:-3]}')
-
 
 # Token from Secret Variable
 bot.run(configData["TOKEN"])

@@ -22,51 +22,6 @@ class PomodoroInput(commands.Cog):
         PomodoroInput.removeMessage = removeMessage
         PomodoroInput.selectionMenuMessage = selectionMenuMessage
 
-    async def responseEndButton(self):
-        PomodoroClock.finishState[self.user.id] = True
-        PomodoroInput.sessionActive[self.user.id] = False
-
-        # Trying to remove a selection menu.
-        try:
-            await PomodoroInput.selectionMenuMessage[self.user.id].delete()
-
-        # No menu is active, therefore we pass it.
-        except nextcord.errors.NotFound:
-            pass
-
-        # Trying to remove a pause message.
-        try:
-            await PomodoroClock.pauseMessage[self.user.id].delete()
-
-            # Since pause message is outside of the clock function we need to manually finish the session.
-            await PomodoroClock.finishPomodoro(self, self.user, self.user.id)
-
-        # No pause message, therefore we pass it.
-        except (nextcord.errors.NotFound, KeyError):
-            pass
-
-        embed = nextcord.Embed(description=(
-            "Your session has **Stopped**. You can begin a new one."), colour=nextcord.Colour.from_rgb(209, 65, 65))
-        await PomodoroInput.removeMessage[self.user.id].edit(embed=embed, view=View())
-
-    async def responseContinueButton(self):
-        embed = nextcord.Embed(description=(
-            "Your session is **Continuing**."), colour=nextcord.Colour.from_rgb(57, 204, 86))
-        await PomodoroInput.removeMessage[self.user.id].edit(embed=embed, view=View())
-
-    async def setButtons():
-        continueButton = Button(label="Continue Session",
-                                style=ButtonStyle.green)
-        endButton = Button(label="End Session", style=ButtonStyle.red)
-
-        # Button View for any paused sessions.
-        PomodoroInput.SessionButtons = View()
-        PomodoroInput.SessionButtons.add_item(continueButton)
-        PomodoroInput.SessionButtons.add_item(endButton)
-
-        # Response functions.
-        continueButton.callback = PomodoroInput.responseContinueButton
-        endButton.callback = PomodoroInput.responseEndButton
 
     # Study command that will run the Selection Menu.
 
@@ -75,13 +30,10 @@ class PomodoroInput(commands.Cog):
 
         # If the user is in an active session, we will stop the function from continuing.
         if (ctx.author.id) in Verification.sessionActive:
-            await PomodoroInput.setButtons()
-            embed = nextcord.Embed(description=(
-                "You currently have an **active session.**"), colour=nextcord.Colour.from_rgb(209, 65, 65))
-            PomodoroInput.removeMessage[ctx.author.id] = await ctx.author.send(view=PomodoroInput.SessionButtons, embed=embed)
+            await Verification.verificationResponse(self, ctx.author, ctx.author.id)
             return
 
-        Verification.addUserVerification(ctx.author.id)
+        await Verification.addUserVerification(ctx.author.id)
         PomodoroInput.selectionMenuMessage[ctx.author.id] = await ctx.author.send("Please choose a selection", view=DropdownView())
 
 
