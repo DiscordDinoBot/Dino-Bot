@@ -27,7 +27,6 @@ class PomodoroInput(commands.Cog):
 
     @commands.command()
     async def study(self, ctx):
-
         # If the user is in an active session, we will stop the function from continuing.
         if (ctx.author.id) in Verification.sessionActive:
             await Verification.verificationResponse(self, ctx.author, ctx.author.id)

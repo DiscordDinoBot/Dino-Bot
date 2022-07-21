@@ -18,15 +18,6 @@ class TimerInput(commands.Cog):
     @commands.command()
     async def timer(self, ctx):
 
-        # If the user is in an active session, we will stop the function from continuing.
-        if ctx.author.id in PomodoroInput.sessionActive:
-
-            if PomodoroInput.sessionActive[ctx.author.id] == True:
-                embed = nextcord.Embed(description=(
-                    "You currently have an **active session.**"), colour=nextcord.Colour.from_rgb(209, 65, 65))
-                PomodoroInput.removeMessage[ctx.author.id] = await ctx.author.send(view=PomodoroInput.SessionButtons, embed=embed)
-                return
-
         PomodoroInput.sessionActive[ctx.author.id] = True
 
         TimerInput.timerSelectionMenuMessage[ctx.author.id] = await ctx.author.send("Please choose a selection", view=DropdownView())

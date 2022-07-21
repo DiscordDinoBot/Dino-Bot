@@ -193,6 +193,35 @@ class UserInterface(commands.Cog):
 
         return displayDescription
 
+    async def getDisplayTitle(self, sessionState):
+        if (sessionState) == 7:
+            displayTitle = "Long Break"
+
+        elif (sessionState) in (1, 3, 5):
+            displayTitle = "Break"
+
+        elif (sessionState) in (0, 2, 4, 6):
+            displayTitle = "Study"
+
+        return displayTitle
+
+    async def getDisplayColour(self, sessionState):
+        if (sessionState == 7):
+            red = 8
+            green = 54
+            blue = 133
+
+        elif (sessionState) in (1, 3, 5):
+            red = 61
+            green = 53
+            blue = 102
+
+        elif(sessionState) in (0, 2, 4, 6):
+            red = 255
+            green = blue = 66
+
+        return red, green, blue
+
 
 def setup(bot):
     bot.add_cog(UserInterface(bot))

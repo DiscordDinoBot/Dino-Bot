@@ -11,7 +11,7 @@ class Version(commands.Cog):
     @commands.command()
     async def version(self, ctx):
         # <--- CHANGE VERSION NUMBER HERE
-        await ctx.send("Dino Bot is running on version **0.5.0**")
+        await ctx.send("Dino Bot is running on version **0.5.1**")
 
 
 def setup(bot):
