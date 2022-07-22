@@ -6,7 +6,7 @@ class UserInterface(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def getFinishDisplayDescription(self, totalTime):
+    async def getFinishDisplayDescription(totalTime):
 
         totalMinute, totalSecond = divmod(totalTime, 60)
 
@@ -149,7 +149,7 @@ class UserInterface(commands.Cog):
 
         return finishDisplayDescription
 
-    async def getDisplayDescription(self, remainingSeconds):
+    async def getDisplayDescription(remainingSeconds):
 
         totalMinute = divmod(remainingSeconds, 60)[0]
 
@@ -193,7 +193,7 @@ class UserInterface(commands.Cog):
 
         return displayDescription
 
-    async def getDisplayTitle(self, sessionState):
+    async def getDisplayTitle(sessionState):
         if (sessionState) == 7:
             displayTitle = "Long Break"
 
@@ -205,7 +205,7 @@ class UserInterface(commands.Cog):
 
         return displayTitle
 
-    async def getDisplayColour(self, sessionState):
+    async def getDisplayColour(sessionState):
         if (sessionState == 7):
             red = 8
             green = 54

@@ -1,25 +1,31 @@
 import nextcord
 from nextcord.ext import commands
 from commands.study.pomodoroInput import PomodoroInput
-
+from .timer import Timer
+from helpers.verification import Verification
 
 # Class that takes in the input from Selection Menu for the bot.
+
+
 class TimerInput(commands.Cog):
     def __init__(self, bot):
 
         TimerInput.bot = bot
 
         timerSelectionMenuMessage = {}
-
         TimerInput.timerSelectionMenuMessage = timerSelectionMenuMessage
+
+        TimerInput.timerFile = Timer(bot)
 
     # Study command that will run the Selection Menu.
 
     @commands.command()
     async def timer(self, ctx):
+        if (ctx.author.id) in Verification.sessionActive:
+            await Verification.verificationResponse(self, ctx.author, ctx.author.id)
+            return
 
-        PomodoroInput.sessionActive[ctx.author.id] = True
-
+        await Verification.addUserVerification(ctx.author.id)
         TimerInput.timerSelectionMenuMessage[ctx.author.id] = await ctx.author.send("Please choose a selection", view=DropdownView())
 
 
@@ -139,11 +145,11 @@ class DropdownView(nextcord.ui.View):
     async def callback(self, select, interaction: nextcord.Interaction):
 
         # Convert into an integer and to seconds
-        userValue = (int(select.values[0]) * 60)
-
-        print(userValue)
+        timerAmount = (int(select.values[0]) * 60)
 
         await TimerInput.timerSelectionMenuMessage[interaction.user.id].delete()
+        await TimerInput.timerFile.timerSet(interaction.user.id)
+        await TimerInput.timerFile.timerClock(interaction.user, interaction.user.id, timerAmount)
 
 
 # Setup function.

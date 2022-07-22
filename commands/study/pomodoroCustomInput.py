@@ -2,7 +2,6 @@ import nextcord
 from nextcord.ext import commands
 from .pomodoroClock import PomodoroClock
 
-
 class PomodoroCustomInput(commands.Cog):
     def __init__(self, bot):
 

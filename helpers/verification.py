@@ -54,6 +54,9 @@ class Verification(commands.Cog):
         await Verification.verificationResponseMessage[userIdentity].edit(view=None, embed=embed)
 
     async def verificationEndResponse(self):
+
+        #RUN FINISH POMODORO FUNCTION
+
         PomodoroClock.finishState[self.user.id] = True
         await Verification.removeUserVerification(self.user.id)
         await Verification.removeMessage(self, self.user, self.user.id)

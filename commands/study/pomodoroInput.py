@@ -1,7 +1,5 @@
 import nextcord
 from nextcord.ext import commands
-from nextcord import ButtonStyle
-from nextcord.ui import Button, View
 from helpers.verification import Verification
 from .pomodoroClock import PomodoroClock
 from .pomodoroCustomInput import PomodoroCustomInput
@@ -22,9 +20,7 @@ class PomodoroInput(commands.Cog):
         PomodoroInput.removeMessage = removeMessage
         PomodoroInput.selectionMenuMessage = selectionMenuMessage
 
-
     # Study command that will run the Selection Menu.
-
     @commands.command()
     async def study(self, ctx):
         # If the user is in an active session, we will stop the function from continuing.
