@@ -7,7 +7,7 @@ from asyncio import sleep
 from helpers.userInterface import UserInterface
 from helpers.verification import Verification
 
-#Function that runs the timer for the user.
+
 class Timer(commands.Cog):
     def __init__(self, bot):
 

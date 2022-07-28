@@ -128,7 +128,7 @@ class DropdownView(nextcord.ui.View):
 
         # This will run the cancel selection for the menu.
         if (select.values[0] == 'Cancel'):
-            Verification.removeUserVerification(interaction.user.id)
+            await Verification.removeUserVerification(interaction.user.id)
 
         # Custom is selected.
         elif (select.values[0] == "Custom"):
@@ -136,7 +136,7 @@ class DropdownView(nextcord.ui.View):
 
         # Redirects any other selections to the control file.
         else:
-            await PomodoroInput.pomodoroClockFile.setPomodoro(pomodoroTime, shortBreak, longBreak, interaction.user.id)
+            await PomodoroInput.pomodoroClockFile.setPomodoro(pomodoroTime, shortBreak, longBreak, interaction.user, interaction.user.id)
             await PomodoroInput.pomodoroClockFile.runPomodoro(interaction.user, interaction.user.id)
 
 

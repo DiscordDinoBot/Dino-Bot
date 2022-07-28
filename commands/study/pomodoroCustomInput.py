@@ -2,6 +2,7 @@ import nextcord
 from nextcord.ext import commands
 from .pomodoroClock import PomodoroClock
 
+
 class PomodoroCustomInput(commands.Cog):
     def __init__(self, bot):
 
@@ -172,7 +173,7 @@ class DropdownView(nextcord.ui.View):
             await PomodoroCustomInput.customSelectionMenuMessage[interaction.user.id].delete()
 
             # Runs the pomodoro clock file with the session times collected
-            await PomodoroCustomInput.pomodoroClockFile.setPomodoro(pomodoroTime, shortBreak, longBreak, interaction.user.id)
+            await PomodoroCustomInput.pomodoroClockFile.setPomodoro(pomodoroTime, shortBreak, longBreak, interaction.user, interaction.user.id)
             await PomodoroCustomInput.pomodoroClockFile.runPomodoro(interaction.user, interaction.user.id)
 
 

@@ -4,8 +4,6 @@ from commands.study.pomodoroInput import PomodoroInput
 from .timer import Timer
 from helpers.verification import Verification
 
-# Class that takes in the input from Selection Menu for the bot.
-
 
 class TimerInput(commands.Cog):
     def __init__(self, bot):
@@ -16,8 +14,6 @@ class TimerInput(commands.Cog):
         TimerInput.timerSelectionMenuMessage = timerSelectionMenuMessage
 
         TimerInput.timerFile = Timer(bot)
-
-    # Study command that will run the Selection Menu.
 
     @commands.command()
     async def timer(self, ctx):

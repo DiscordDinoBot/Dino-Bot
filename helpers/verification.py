@@ -55,7 +55,7 @@ class Verification(commands.Cog):
 
     async def verificationEndResponse(self):
 
-        #RUN FINISH POMODORO FUNCTION
+        # RUN FINISH POMODORO FUNCTION
 
         PomodoroClock.finishState[self.user.id] = True
         await Verification.removeUserVerification(self.user.id)
