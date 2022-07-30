@@ -21,13 +21,13 @@ class PomodoroCustomInput(commands.Cog):
 
     async def pomodoroStudyCustomInput(self, user, userIdentity):
         PomodoroCustomInput.customSelectionState[userIdentity] = 0
-        PomodoroCustomInput.customSelectionMenuMessage[userIdentity] = await user.send("Choose a **Study** session duration", view=DropdownView())
+        PomodoroCustomInput.customSelectionMenuMessage[userIdentity] = await user.send("Choose a **Study** session duration", view=DropdownView(timeout=None))
 
     async def pomodoroBreakCustomInput(self, user, userIdentity):
-        PomodoroCustomInput.customSelectionMenuMessage[userIdentity] = await user.send("Choose a **Break** session duration", view=DropdownView())
+        PomodoroCustomInput.customSelectionMenuMessage[userIdentity] = await user.send("Choose a **Break** session duration", view=DropdownView(timeout=None))
 
     async def pomodoroLongBreakCustomInput(self, user, userIdentity):
-        PomodoroCustomInput.customSelectionMenuMessage[userIdentity] = await user.send("Choose a **Long Break** session duration", view=DropdownView())
+        PomodoroCustomInput.customSelectionMenuMessage[userIdentity] = await user.send("Choose a **Long Break** session duration", view=DropdownView(timeout=None))
 
 
 class DropdownView(nextcord.ui.View):
@@ -171,10 +171,18 @@ class DropdownView(nextcord.ui.View):
 
             # Deletes previous message
             await PomodoroCustomInput.customSelectionMenuMessage[interaction.user.id].delete()
+            
+            #Deletes the data from the dictionaries to save space
+            del PomodoroCustomInput.customSelectionMenuMessage[interaction.user.id]
+            del PomodoroCustomInput.customSelectionState[interaction.user.id]
+            del PomodoroCustomInput.studyTime[interaction.user.id]
+            del PomodoroCustomInput.breakTime[interaction.user.id]
 
             # Runs the pomodoro clock file with the session times collected
             await PomodoroCustomInput.pomodoroClockFile.setPomodoro(pomodoroTime, shortBreak, longBreak, interaction.user, interaction.user.id)
             await PomodoroCustomInput.pomodoroClockFile.runPomodoro(interaction.user, interaction.user.id)
+
+
 
 
 def setup(bot):

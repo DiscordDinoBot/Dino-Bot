@@ -13,10 +13,10 @@ class Timer(commands.Cog):
 
         self.bot = bot
 
-        Timer.timerFinishState = {}
+        Timer.timerMessage = {}
+        Timer.finishState = {}
         Timer.timerPauseState = {}
         Timer.timeStudied = {}
-        Timer.pauseMessage = {}
         Timer.timeRemaining = {}
 
     async def timerSet(self, userIdentity):
@@ -28,14 +28,14 @@ class Timer(commands.Cog):
         embed = nextcord.Embed(title=(f"Timer"), description=(
             displayDescription), colour=nextcord.Colour.from_rgb(196, 138, 51))
 
-        displayMessage = await user.send(view=TimerButtons.timerButtonView, embed=embed)
+        Timer.timerMessage[userIdentity] = await user.send(view=TimerButtons.timerButtonView, embed=embed)
 
         initialSeconds = timeSeconds
 
-        Timer.timerFinishState[userIdentity] = False
+        Timer.finishState[userIdentity] = False
         Timer.timerPauseState[userIdentity] = False
 
-        while (timeSeconds > 0) and (Timer.timerFinishState[userIdentity] == False) and (Timer.timerPauseState[userIdentity] == False):
+        while (timeSeconds > 0) and (Timer.finishState[userIdentity] == False) and (Timer.timerPauseState[userIdentity] == False):
             await sleep(1)
             timeSeconds -= 1
 
@@ -44,15 +44,19 @@ class Timer(commands.Cog):
 
                 embed = nextcord.Embed(title=(f"Timer"), description=(
                     displayDescription), colour=nextcord.Colour.from_rgb(196, 138, 51))
-                await displayMessage.edit(view=TimerButtons.timerButtonView, embed=embed)
+                await Timer.timerMessage[userIdentity].edit(view=TimerButtons.timerButtonView, embed=embed)
 
-        await displayMessage.delete()
+        try:
+            await Timer.timerMessage[userIdentity].delete()
+
+        except (nextcord.errors.NotFound):
+            pass
 
         timeStudied = initialSeconds - timeSeconds
         Timer.timeStudied[userIdentity] += timeStudied
         Timer.timeRemaining[userIdentity] = timeSeconds
 
-        if (Timer.timerFinishState[userIdentity] == True) or (timeSeconds <= 0):
+        if (Timer.finishState[userIdentity] == True) or (timeSeconds <= 0):
             await Timer.timerFinish(user, userIdentity)
 
         else:
@@ -61,7 +65,7 @@ class Timer(commands.Cog):
     async def timerPause(user, userIdentity):
         embed = nextcord.Embed(title=(f"Timer"), description=(
             "Your timer is paused."), colour=nextcord.Colour.from_rgb(237, 146, 71))
-        Timer.pauseMessage[userIdentity] = await user.send(view=TimerButtons.timerPausedView, embed=embed)
+        Timer.timerMessage[userIdentity] = await user.send(view=TimerButtons.timerPausedView, embed=embed)
 
     async def timerFinish(user, userIdentity):
         timeSeconds = Timer.timeStudied[userIdentity]
@@ -74,6 +78,12 @@ class Timer(commands.Cog):
         await user.send(embed=embed)
 
         await Verification.removeUserVerification(userIdentity)
+
+        del Timer.timerMessage[userIdentity]
+        del Timer.finishState[userIdentity]
+        del Timer.timerPauseState[userIdentity]
+        del Timer.timeStudied[userIdentity]
+        del Timer.timeRemaining[userIdentity]
 
 
 class TimerButtons():
@@ -99,13 +109,13 @@ class TimerButtons():
         resumeButton.callback = TimerButtons.responseResumeButton
 
     async def responseFinishButton(interaction):
-        Timer.timerFinishState[interaction.user.id] = True
+        Timer.finishState[interaction.user.id] = True
 
     async def responsePauseButton(interaction):
         Timer.timerPauseState[interaction.user.id] = True
 
     async def responseResumeButton(interaction):
-        await Timer.pauseMessage[interaction.user.id].delete()
+        await Timer.timerMessage[interaction.user.id].delete()
         timeSeconds = Timer.timeRemaining[interaction.user.id]
         await Timer.timerClock(interaction, interaction.user, interaction.user.id, timeSeconds)
 

@@ -2,45 +2,65 @@ import nextcord
 from nextcord import ButtonStyle
 from nextcord.ui import Button, View
 from nextcord.ext import commands
-from commands.study.pomodoroClock import PomodoroClock
 
 
 class Verification(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        Verification.bot = bot
         Verification.sessionActive = {}
         Verification.verificationResponseMessage = {}
-
-        Verification.pomodoroClockFile = PomodoroClock(bot)
 
     async def addUserVerification(userIdentity):
         Verification.sessionActive[userIdentity] = True
 
     async def removeUserVerification(userIdentity):
-        del Verification.sessionActive[userIdentity]
+        try:
+            del Verification.sessionActive[userIdentity]
 
-    async def removeMessage(self, user, userIdentity):
+        except (KeyError):
+            pass
 
+    async def removeMessage(self, userIdentity):
+        embed = nextcord.Embed(description=(
+            "Your session is **Continuing**."), colour=nextcord.Colour.from_rgb(57, 204, 86))
+        await Verification.verificationResponseMessage[userIdentity].edit(view=None, embed=embed)
+
+    async def getUserSessions(userIdentity):
+        from commands.study.pomodoroClock import PomodoroClock
+        from commands.study.pomodoroCustomInput import PomodoroCustomInput
         from commands.study.pomodoroInput import PomodoroInput
+        from commands.timer.timer import Timer
+        from commands.timer.timerInput import TimerInput
 
-        # Trying to remove a selection menu.
-        try:
-            await PomodoroInput.selectionMenuMessage[userIdentity].delete()
+        userMessages = [PomodoroInput.selectionMenuMessage,
+                        PomodoroClock.pomodoroMessage,
+                        PomodoroCustomInput.customSelectionMenuMessage,
+                        TimerInput.timerSelectionMenuMessage,
+                        Timer.timerMessage,
+                        Verification.verificationResponseMessage
+                        ]
 
-        # No menu is active, therefore we pass it.
-        except nextcord.errors.NotFound:
-            pass
+        userSessionStates = [PomodoroClock,
+                             Timer
+                             ]
 
-        # Trying to remove a pause message.
-        try:
-            await PomodoroClock.pauseMessage[userIdentity].delete()
+        return userMessages, userSessionStates
 
-            # Since pause message is outside of the clock function we need to manually finish the session.
-            await PomodoroClock.finishPomodoro(self, user, userIdentity)
+    async def finishSessions(userSessionStates, userIdentity):
+        for sessionState in userSessionStates:
+            try:
+                sessionState.finishState[userIdentity] = True
 
-        # No pause message, therefore we pass it.
-        except (nextcord.errors.NotFound, KeyError):
-            pass
+            except (nextcord.errors.NotFound, KeyError, AttributeError):
+                pass
+
+    async def removeMessage(userMessages, userIdentity):
+        for message in userMessages:
+            try:
+                await message[userIdentity].delete()
+
+            except (nextcord.errors.NotFound, KeyError):
+                pass
 
     async def verificationResponse(self, user, userIdentity):
         await VerificationButtons.setVerificationButtons(self)
@@ -53,17 +73,11 @@ class Verification(commands.Cog):
             "Your session is **Continuing**."), colour=nextcord.Colour.from_rgb(57, 204, 86))
         await Verification.verificationResponseMessage[userIdentity].edit(view=None, embed=embed)
 
-    async def verificationEndResponse(self):
-
-        # RUN FINISH POMODORO FUNCTION
-
-        PomodoroClock.finishState[self.user.id] = True
-        await Verification.removeUserVerification(self.user.id)
-        await Verification.removeMessage(self, self.user, self.user.id)
-
-        embed = nextcord.Embed(description=(
-            "Your session has **Stopped**. You can begin a new one."), colour=nextcord.Colour.from_rgb(209, 65, 65))
-        await Verification.verificationResponseMessage[self.user.id].edit(view=None, embed=embed)
+    async def verificationEndResponse(interaction):
+        userMessages, userSessionStates = await Verification.getUserSessions(interaction.user.id)
+        await Verification.finishSessions(userSessionStates, interaction.user.id)
+        await Verification.removeMessage(userMessages, interaction.user.id)
+        await Verification.removeUserVerification(interaction.user.id)
 
 
 class VerificationButtons(commands.Cog):

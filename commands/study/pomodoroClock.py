@@ -85,8 +85,8 @@ class PomodoroClock(commands.Cog):
     async def getLongBreakTime(self, userIdentity):
         return PomodoroClock.longBreakDictionary[userIdentity]
 
-    async def responseFinishButton(interaction: nextcord.Interaction):
-        PomodoroClock.finishState[interaction.user.id] = True
+    async def responseFinishButton(self):
+        PomodoroClock.finishState[self.user.id] = True
 
     async def responsePauseButton(self):
         PomodoroClock.pauseState[self.user.id] = True
@@ -95,11 +95,16 @@ class PomodoroClock(commands.Cog):
         PomodoroClock.skipState[self.user.id] = True
 
     async def responseResumeButton(interaction):
-        await PomodoroClock.pomodoroMessage[interaction.user.id].delete()
         PomodoroClock.resumeState[interaction.user.id] = True
         await PomodoroClock.controlPomodoro(interaction, interaction.user, interaction.user.id)
 
     async def controlPomodoro(self, user, userIdentity):
+
+        try:
+            await PomodoroClock.pomodoroMessage[userIdentity].delete()
+
+        except (nextcord.errors.NotFound, KeyError):
+            pass
 
         # Checks if the user wants to skip the state
         if (PomodoroClock.skipState[userIdentity] == True):
@@ -171,8 +176,6 @@ class PomodoroClock(commands.Cog):
             timeStudied = initialSeconds - timeSeconds
             PomodoroClock.timeStudied[userIdentity] += timeStudied
 
-        await PomodoroClock.pomodoroMessage[userIdentity].delete()
-
         await PomodoroClock.setTimeRemaining(self, userIdentity, timeSeconds)
 
         await PomodoroClock.controlPomodoro(self, user, userIdentity)
@@ -197,7 +200,19 @@ class PomodoroClock(commands.Cog):
 
         await Verification.removeUserVerification(userIdentity)
 
-        PomodoroClock.pomodoroMessage[userIdentity] = await user.send(view=None, embed=embed)
+        await user.send(view=None, embed=embed)
+
+        # Removes all user data from the dictionarys
+        del PomodoroClock.studyDictionary[userIdentity]
+        del PomodoroClock.breakDictionary[userIdentity]
+        del PomodoroClock.longBreakDictionary[userIdentity]
+        del PomodoroClock.sessionState[userIdentity]
+        del PomodoroClock.pauseState[userIdentity]
+        del PomodoroClock.skipState[userIdentity]
+        del PomodoroClock.finishState[userIdentity]
+        del PomodoroClock.resumeState[userIdentity]
+        del PomodoroClock.timeRemaining[userIdentity]
+        del PomodoroClock.timeStudied[userIdentity]
 
     async def runPomodoro(self, user, userIdentity):
         await self.controlPomodoro(user, userIdentity)

@@ -14,12 +14,8 @@ class PomodoroInput(commands.Cog):
         PomodoroInput.pomodoroCustomInputFile = PomodoroCustomInput(bot)
         PomodoroInput.VerificationFile = Verification(bot)
 
-        selectionMenuMessage = {}
-        removeMessage = {}
-
-        PomodoroInput.removeMessage = removeMessage
-        PomodoroInput.selectionMenuMessage = selectionMenuMessage
-
+        PomodoroInput.selectionMenuMessage = {}
+    
     # Study command that will run the Selection Menu.
     @commands.command()
     async def study(self, ctx):
@@ -29,8 +25,7 @@ class PomodoroInput(commands.Cog):
             return
 
         await Verification.addUserVerification(ctx.author.id)
-        PomodoroInput.selectionMenuMessage[ctx.author.id] = await ctx.author.send("Please choose a selection", view=DropdownView())
-
+        PomodoroInput.selectionMenuMessage[ctx.author.id] = await ctx.author.send("Please choose a selection", view=DropdownView(timeout=None))
 
 class DropdownView(nextcord.ui.View):
     @nextcord.ui.select(
@@ -124,7 +119,11 @@ class DropdownView(nextcord.ui.View):
             shortBreak = 300
             longBreak = 900
 
+        #Removes the message from Discord
         await PomodoroInput.selectionMenuMessage[interaction.user.id].delete()
+
+        #Removes the message from the Dictionary
+        del PomodoroInput.selectionMenuMessage[interaction.user.id]
 
         # This will run the cancel selection for the menu.
         if (select.values[0] == 'Cancel'):
