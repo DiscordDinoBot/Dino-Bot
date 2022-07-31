@@ -1,7 +1,6 @@
 import os
 import nextcord
 import json
-
 from nextcord.ext import commands
 
 '''
@@ -22,7 +21,10 @@ if os.path.exists(os.getcwd() + "/config.json"):
 # Creates the JSON file in the format for the developer.
 else:
     # Template for the JSON file.
-    configTemplate = {"TOKEN": ""}  # INSERT TOKEN INSIDE "" (config.json)
+    configTemplate = {
+                        "TOKEN": "", # INSERT TOKEN INSIDE "" (config.json)
+                        "DATABASEPASSWORD": "" # INSERT DATABASE PASSWORD INSIDE "" (config.json)
+                    }  
 
     # Creates the file and sets it to the same layout as our code.
     with open(os.getcwd() + "/config.json", "w+") as x:
@@ -81,6 +83,11 @@ async def reload(ctx, extension):
 for filename in os.listdir('./helpers'):
     if filename.endswith('.py'):
         bot.load_extension(f'helpers.{filename[:-3]}')
+
+# When the bot turns on this will load all the timer files in the database folder.
+for filename in os.listdir('./database'):
+    if filename.endswith('.py'):
+        bot.load_extension(f'database.{filename[:-3]}')
 
 # When the bot turns on this will load all the files in the commands folder.
 for filename in os.listdir('./commands'):

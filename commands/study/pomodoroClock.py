@@ -5,6 +5,7 @@ from nextcord.ui import Button, View
 from nextcord.ext import commands
 from datetime import date
 from helpers.userInterface import UserInterface
+from database.database import Database
 
 
 class PomodoroClock(commands.Cog):
@@ -201,6 +202,8 @@ class PomodoroClock(commands.Cog):
         await Verification.removeUserVerification(userIdentity)
 
         await user.send(view=None, embed=embed)
+
+        await Database.databaseInsertion(userIdentity, timeSeconds)
 
         # Removes all user data from the dictionarys
         del PomodoroClock.studyDictionary[userIdentity]

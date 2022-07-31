@@ -6,6 +6,7 @@ from nextcord.ext import commands
 from asyncio import sleep
 from helpers.userInterface import UserInterface
 from helpers.verification import Verification
+from database.database import Database
 
 
 class Timer(commands.Cog):
@@ -76,6 +77,8 @@ class Timer(commands.Cog):
             finishDisplayDescription), colour=nextcord.Colour.from_rgb(74, 189, 100))
 
         await user.send(embed=embed)
+
+        await Database.databaseInsertion(userIdentity, timeSeconds)
 
         await Verification.removeUserVerification(userIdentity)
 

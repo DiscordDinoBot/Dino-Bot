@@ -3,6 +3,7 @@ from nextcord.ext import commands
 from .timer import Timer
 from helpers.verification import Verification
 
+
 class TimerInput(commands.Cog):
     def __init__(self, bot):
 
@@ -137,7 +138,7 @@ class DropdownView(nextcord.ui.View):
     )
     # This is the callback function that will run once the selection has been made from the user.
     async def callback(self, select, interaction: nextcord.Interaction):
-        
+
         # Convert into an integer and to seconds
         timerAmount = (int(select.values[0]) * 60)
 
