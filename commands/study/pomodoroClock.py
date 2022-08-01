@@ -158,10 +158,10 @@ class PomodoroClock(commands.Cog):
         PomodoroClock.pomodoroMessage[userIdentity] = await user.send(view=PomodoroClock.activeSessionButtons, embed=embed)
 
         initialSeconds = timeSeconds
-
+        
         while (timeSeconds > 0) and (PomodoroClock.pauseState[userIdentity] == False) and (PomodoroClock.finishState[userIdentity] == False) and (PomodoroClock.skipState[userIdentity] == False):
             await asyncio.sleep(1)
-
+            
             if ((timeSeconds % 60) == 0):
                 red, green, blue = await UserInterface.getDisplayColour(PomodoroClock.sessionState[userIdentity])
                 displayTitle = await UserInterface.getDisplayTitle(PomodoroClock.sessionState[userIdentity])

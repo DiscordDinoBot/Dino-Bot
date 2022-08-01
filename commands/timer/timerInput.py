@@ -1,4 +1,5 @@
 import nextcord
+from nextcord import Interaction
 from nextcord.ext import commands
 from .timer import Timer
 from helpers.verification import Verification
@@ -14,15 +15,16 @@ class TimerInput(commands.Cog):
 
         TimerInput.timerFile = Timer(bot)
 
-    @commands.command()
-    async def timer(self, ctx):
-        if (ctx.author.id) in Verification.sessionActive:
-            await Verification.verificationResponse(self, ctx.author, ctx.author.id)
+    @nextcord.slash_command(description="Create a timer for studying.",guild_ids=[1003759523674210416])
+    async def timer(self, interaction: Interaction):
+        if (interaction.user.id) in Verification.sessionActive:
+            await Verification.verificationResponse(self, interaction.user, interaction.user.id)
+            await interaction.response.send_message("You have an active session. Please check private messages to proceed.", ephemeral=True)
             return
 
-        await Verification.addUserVerification(ctx.author.id)
-        TimerInput.timerSelectionMenuMessage[ctx.author.id] = await ctx.author.send("Please choose a selection", view=DropdownView(timeout=None))
-
+        await Verification.addUserVerification(interaction.user.id)
+        TimerInput.timerSelectionMenuMessage[interaction.user.id] = await interaction.user.send("Please choose a selection", view=DropdownView(timeout=None))
+        await interaction.response.send_message("Your session has been sent in a private message.", ephemeral=True)
 
 class DropdownView(nextcord.ui.View):
 

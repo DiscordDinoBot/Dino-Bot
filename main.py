@@ -1,6 +1,7 @@
 import os
 import nextcord
 import json
+import nextcord
 from nextcord.ext import commands
 
 '''
@@ -45,10 +46,15 @@ async def on_ready():
     # Status for the bot.
     await bot.change_presence(status=nextcord.Status.online, activity=nextcord.Activity(type=nextcord.ActivityType.listening, name="!study"))
 
+# Checking what version the bot is running on.
+@bot.command()
+# Checks if the user is a owner.
+@commands.is_owner()
+async def version(ctx):
+    await ctx.send("Dino Bot is running on version **0.5.6**")
 
 # Loads a specific cog.
 @bot.command()
-# Checks if the user is a owner.
 @commands.is_owner()
 async def load(ctx, extension):
     try:
@@ -104,6 +110,7 @@ for filename in os.listdir('./commands/study'):
 for filename in os.listdir('./commands/timer'):
     if filename.endswith('.py'):
         bot.load_extension(f'commands.timer.{filename[:-3]}')
+
 
 # Token from Secret Variable
 bot.run(configData["TOKEN"])

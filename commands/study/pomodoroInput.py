@@ -1,4 +1,5 @@
 import nextcord
+from nextcord import Interaction
 from nextcord.ext import commands
 from helpers.verification import Verification
 from .pomodoroClock import PomodoroClock
@@ -16,16 +17,18 @@ class PomodoroInput(commands.Cog):
 
         PomodoroInput.selectionMenuMessage = {}
     
-    # Study command that will run the Selection Menu.
-    @commands.command()
-    async def study(self, ctx):
+    @nextcord.slash_command(description="Create a Pomodoro session for studying.",guild_ids=[1003759523674210416])
+    async def study(self, interaction: Interaction):
+    
         # If the user is in an active session, we will stop the function from continuing.
-        if (ctx.author.id) in Verification.sessionActive:
-            await Verification.verificationResponse(self, ctx.author, ctx.author.id)
+        if (interaction.user.id) in Verification.sessionActive:
+            await Verification.verificationResponse(self, interaction.user, interaction.user.id)
+            await interaction.response.send_message("You have an active session. Please check private messages to proceed.", ephemeral=True)
             return
 
-        await Verification.addUserVerification(ctx.author.id)
-        PomodoroInput.selectionMenuMessage[ctx.author.id] = await ctx.author.send("Please choose a selection", view=DropdownView(timeout=None))
+        await Verification.addUserVerification(interaction.user.id)
+        PomodoroInput.selectionMenuMessage[interaction.user.id] = await interaction.user.send("Please choose a selection", view=DropdownView(timeout=None))
+        await interaction.response.send_message("Your session has been sent in a private message.", ephemeral=True)
 
 class DropdownView(nextcord.ui.View):
     @nextcord.ui.select(

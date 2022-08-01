@@ -63,6 +63,12 @@ class Verification(commands.Cog):
                 pass
 
     async def verificationResponse(self, user, userIdentity):
+        try:
+            await Verification.verificationResponseMessage[userIdentity].delete()
+
+        except (KeyError, nextcord.errors.NotFound):
+            pass
+
         await VerificationButtons.setVerificationButtons(self)
         embed = nextcord.Embed(description=(
             "You currently have an **active session.**"), colour=nextcord.Colour.from_rgb(209, 65, 65))

@@ -1,3 +1,4 @@
+from discord import Interaction
 import nextcord
 from nextcord.ext import commands
 from database.database import Database
@@ -8,17 +9,17 @@ class Stats(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
-    async def stats(self, ctx):
+    @nextcord.slash_command(description="Showcases the amount of time that you have studied.",guild_ids=[1003759523674210416])
+    async def stats(self, interaction: Interaction):
 
-        totalTimeStudied = await Database.databaseReceiving(ctx.author.id)
+        totalTimeStudied = await Database.databaseReceiving(interaction.user.id)
 
         totalTimeStudiedMessage = (await UserInterface.getFinishDisplayDescription(totalTimeStudied)).strip("You completed of studying.").replace("*", "")
     
         embed = nextcord.Embed(
 
             title="Study Statistics",
-            description="Check out how long you have been studying!",
+            description=f"Check out how long {interaction.user.mention} has been studying!",
             colour=nextcord.Colour.from_rgb(109, 157, 255)
 
         )
@@ -31,7 +32,7 @@ class Stats(commands.Cog):
         **All Time**: {totalTimeStudiedMessage} \n \
         "),inline="False")
 
-        await ctx.send(embed=embed)
+        await interaction.response.send_message(embed=embed)
 
 
 def setup(bot):

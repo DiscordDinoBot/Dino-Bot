@@ -1,5 +1,6 @@
 import nextcord
 from nextcord.ext import commands
+from nextcord import Interaction
 
 # Custom Help command that can display instructions for the user
 
@@ -9,8 +10,8 @@ class Help(commands.Cog):
         self.bot = bot
 
     # Command that runs the content for the help command
-    @commands.command()
-    async def help(self, ctx):
+    @nextcord.slash_command(description="Provides instructions on how to use the bot.",guild_ids=[1003759523674210416])
+    async def help(self, interaction: Interaction):
 
         embed = nextcord.Embed(
 
@@ -22,12 +23,8 @@ class Help(commands.Cog):
 
         embed.add_field(name="Commands", value="`!study`\n Initiates the study timer and opens the study timer menu\n`!version`\n Displays the bot's version that it's running on\n`!help`\n Displays the bot's commands and guidelines",
                         inline="False")
-
-        # Leave alone:
-        await ctx.author.send(embed=embed)
-
-# Setup function
-
+        
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
 def setup(bot):
     bot.add_cog(Help(bot))
