@@ -1,8 +1,10 @@
 import os
 import nextcord
 import json
-import nextcord
 from nextcord.ext import commands
+
+intents = nextcord.Intents.all()
+intents.message_content = True
 
 '''
 This runs the config JSON file. This will not be included
@@ -32,7 +34,7 @@ else:
         json.dump(configTemplate, x)
 
 # Setting the prefix for the bot. "!"
-bot = commands.Bot(command_prefix="!")
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Removes default help command so we can access our own custom one.
 bot.remove_command('help')
@@ -51,7 +53,7 @@ async def on_ready():
 # Checks if the user is a owner.
 @commands.is_owner()
 async def version(ctx):
-    await ctx.send("Dino Bot is running on version **0.5.6**")
+    await ctx.send("Dino Bot is running on version **0.5.7**")
 
 # Loads a specific cog.
 @bot.command()
@@ -63,7 +65,6 @@ async def load(ctx, extension):
     except Exception:
         await ctx.send("Could not load **" + extension + "** Cog. (Check state of cog or spelling)")
 
-
 # Unloads a specific cog.
 @bot.command()
 @commands.is_owner()
@@ -73,7 +74,6 @@ async def unload(ctx, extension):
         await ctx.send("Unloaded **" + extension + "** Cog.")
     except Exception:
         await ctx.send("Could not unload **" + extension + "** Cog. (Check state of cog or spelling)")
-
 
 # Reloads a specific cog.
 @bot.command()

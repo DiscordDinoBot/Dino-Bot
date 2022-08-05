@@ -78,10 +78,9 @@ class Timer(commands.Cog):
 
         await user.send(embed=embed)
 
-        await Database.databaseInsertion(userIdentity, timeSeconds)
-
         await Verification.removeUserVerification(userIdentity)
-
+        await Database.databaseControl(userIdentity, timeSeconds)
+        
         del Timer.timerMessage[userIdentity]
         del Timer.finishState[userIdentity]
         del Timer.timerPauseState[userIdentity]

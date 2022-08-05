@@ -17,7 +17,7 @@ class PomodoroInput(commands.Cog):
 
         PomodoroInput.selectionMenuMessage = {}
     
-    @nextcord.slash_command(description="Create a Pomodoro session for studying.",guild_ids=[1003759523674210416])
+    @nextcord.slash_command(description="Create a Pomodoro session for studying.",guild_ids=[976595488235216927])
     async def study(self, interaction: Interaction):
     
         # If the user is in an active session, we will stop the function from continuing.
@@ -100,7 +100,7 @@ class DropdownView(nextcord.ui.View):
 
         # Beginner is selected.
         if (select.values[0] == "Beginner"):
-            pomodoroTime = 60
+            pomodoroTime = 900
             shortBreak = 300
             longBreak = 900
 

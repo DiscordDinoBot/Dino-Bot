@@ -1,5 +1,6 @@
 import os
 import json
+import datetime
 from pymongo import MongoClient
 from nextcord.ext import commands
 
@@ -10,7 +11,10 @@ if os.path.exists(os.getcwd() + "/config.json"):
 
     cluster = MongoClient(configData["DATABASEPASSWORD"])
     db = cluster["DinoBot"]
-    collection = db["studyData"]
+    allTimeCollection = db["studyData"]
+    yearCollection = db["studyDataYear"]
+    monthCollection = db["studyDataMonth"]
+    dailyCollection = db["studyDataDaily"]
 
 else:
     print("Database is NOT connected!")
@@ -19,28 +23,67 @@ class Database(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def databaseInsertion(userIdentity, timeStudied):
+    async def allTimeInsertion(userIdentity, timeStudied):
         
         #Checking if the user exists
-        check = collection.find_one({"_id": userIdentity})
+        collection = allTimeCollection.find_one({"_id": userIdentity})
         
         #If no user is in the database we must add them
-        if check is None:
+        if collection is None:
             document = {"_id": userIdentity, "studyTime": timeStudied}
-            collection.insert_one(document)
+            allTimeCollection.insert_one(document)
         
         #If the user is in the database we must add to the exisiting value
         else:
-            result = collection.find_one({"_id": userIdentity}, {"_id": 0, "studyTime": 1})
+            result = allTimeCollection.find_one({"_id": userIdentity}, {"_id": 0, "studyTime": 1})
             updatedAmountStudied = result["studyTime"] + timeStudied
             newResult = {"$set": {"studyTime": updatedAmountStudied}}
-            collection.update_one(result, newResult)
+            allTimeCollection.update_one(result, newResult)
+    
+    async def yearInsertion(userIdentity, timeStudied):
 
+        collection = yearCollection.find_one({"_id": userIdentity})
+        date = datetime.datetime.now()
+        year = int(date.strftime("%Y"))
+
+        result = yearCollection.find_one({"_id": userIdentity}, {"_id": 0, "year": 1})
+        databaseYear = result["year"]
+
+
+        if collection is None or (databaseYear != year):
+            document = {"_id": userIdentity, "yearStudyTime": timeStudied, "year": year}
+            yearCollection.insert_one(document)
+
+        else:
+            result = yearCollection.find_one({"_id": userIdentity}, {"_id": 0, "yearStudyTime": 1})
+            updatedAmountStudied = result["yearStudyTime"] + timeStudied
+            newResult = {"$set": {"yearStudyTime": updatedAmountStudied}}
+            yearCollection.update_one(result, newResult)
+
+    async def monthInsertion(userIdentity, timeStudied):
+        pass
+
+    async def dailyInsertion(userIdentity, timeStudied):
+        pass
+
+    async def databaseControl(userIdentity, timeStudied):
+        await Database.allTimeInsertion(userIdentity, timeStudied)
+        await Database.yearInsertion(userIdentity, timeStudied)
+        await Database.monthInsertion(userIdentity, timeStudied)
+        await Database.dailyInsertion(userIdentity, timeStudied)
+    
     async def databaseReceiving(userIdentity):
-        result = collection.find_one({"_id": userIdentity}, {"_id": 0, "studyTime": 1})
+
+
+        #WRITE A FUNCTION THAT WILL CLEAR ANY OLD DATA ENTRIES OR
+        #SET THE MESSAGES TO EXPIRE INSTEAD
+
+
+        allTime = allTimeCollection.find_one({"_id": userIdentity}, {"_id": 0, "studyTime": 1})
+        yearTime = yearCollection.find_one({"_id": userIdentity}, {"_id": 0, "yearStudyTime": 1})
 
         try:
-            return(result["studyTime"])
+            return(allTime["studyTime"], yearTime["yearStudyTime"])
         
         except (TypeError):
             #If the user has never studied before we cant return anything

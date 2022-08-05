@@ -100,7 +100,7 @@ class PomodoroClock(commands.Cog):
         await PomodoroClock.controlPomodoro(interaction, interaction.user, interaction.user.id)
 
     async def controlPomodoro(self, user, userIdentity):
-
+        
         try:
             await PomodoroClock.pomodoroMessage[userIdentity].delete()
 
@@ -203,7 +203,7 @@ class PomodoroClock(commands.Cog):
 
         await user.send(view=None, embed=embed)
 
-        await Database.databaseInsertion(userIdentity, timeSeconds)
+        await Database.databaseControl(userIdentity, timeSeconds)
 
         # Removes all user data from the dictionarys
         del PomodoroClock.studyDictionary[userIdentity]
