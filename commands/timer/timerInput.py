@@ -15,7 +15,7 @@ class TimerInput(commands.Cog):
 
         TimerInput.timerFile = Timer(bot)
 
-    @nextcord.slash_command(description="Create a timer for studying.",guild_ids=[976595488235216927])
+    @nextcord.slash_command(description="Create a timer for studying.",guild_ids=[674092094364844055])
     async def timer(self, interaction: Interaction):
         if (interaction.user.id) in Verification.sessionActive:
             await Verification.verificationResponse(self, interaction.user, interaction.user.id)

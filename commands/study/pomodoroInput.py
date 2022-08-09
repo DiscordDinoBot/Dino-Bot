@@ -17,7 +17,7 @@ class PomodoroInput(commands.Cog):
 
         PomodoroInput.selectionMenuMessage = {}
     
-    @nextcord.slash_command(description="Create a Pomodoro session for studying.",guild_ids=[976595488235216927])
+    @nextcord.slash_command(description="Create a Pomodoro session for studying.",guild_ids=[674092094364844055])
     async def study(self, interaction: Interaction):
     
         # If the user is in an active session, we will stop the function from continuing.

@@ -10,7 +10,7 @@ class Help(commands.Cog):
         self.bot = bot
 
     # Command that runs the content for the help command
-    @nextcord.slash_command(description="Provides instructions on how to use the bot.",guild_ids=[976595488235216927])
+    @nextcord.slash_command(description="Provides instructions on how to use the bot.",guild_ids=[674092094364844055])
     async def help(self, interaction: Interaction):
 
         embed = nextcord.Embed(

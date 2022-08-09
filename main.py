@@ -46,14 +46,14 @@ async def on_ready():
     # Prints to console telling us that it is logged in.
     print(f'Logged in as {bot.user}\n')
     # Status for the bot.
-    await bot.change_presence(status=nextcord.Status.online, activity=nextcord.Activity(type=nextcord.ActivityType.listening, name="!study"))
+    await bot.change_presence(status=nextcord.Status.online, activity=nextcord.Activity(type=nextcord.ActivityType.listening, name="/study"))
 
 # Checking what version the bot is running on.
 @bot.command()
 # Checks if the user is a owner.
 @commands.is_owner()
 async def version(ctx):
-    await ctx.send("Dino Bot is running on version **0.5.7**")
+    await ctx.send("Dino Bot is running on version **0.5.8**")
 
 # Loads a specific cog.
 @bot.command()

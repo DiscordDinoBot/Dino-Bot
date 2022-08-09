@@ -27,8 +27,8 @@ class Stats(commands.Cog):
 
         embed.add_field(name="Time Ranges", value=(f"\
         **Today**: ----------------\n \
-        **Past Month**: ----------------\n \
-        **Past Year**: {yearTimeStudiedMessage} \n \
+        **This Month**: ----------------\n \
+        **This Year**: {yearTimeStudiedMessage} \n \
         **All Time**: {totalTimeStudiedMessage} \n \
         "),inline="False")
 
