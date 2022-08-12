@@ -60,6 +60,18 @@ class Database(commands.Cog):
         else:
             return((monthCollection.find_one({"_id": userIdentity}, {"_id": 0, "monthStudyTime": 1}))["monthStudyTime"])
 
+    async def dailyStatistics(userIdentity):
+        dailyData = dailyCollection.find_one(
+            {"_id": userIdentity}, {"_id": 0, "yearMonthDay": 1})
+
+        # Checks if the user has studied in the past day.
+        if (dailyData is None) or ((dailyData["yearMonthDay"]) != (int((datetime.datetime.now()).strftime("%Y%m%d")))):
+            return 0
+
+        # Returns the amount of time the user has studied in the day.
+        else:
+            return((dailyCollection.find_one({"_id": userIdentity}, {"_id": 0, "dailyStudyTime": 1}))["dailyStudyTime"])
+
     async def yearValidation(userIdentity):
         yearData = yearCollection.find_one(
             {"_id": userIdentity}, {"_id": 0, "year": 1})
@@ -83,6 +95,18 @@ class Database(commands.Cog):
         # Checks if the month is outdated and will delete it from the database.
         elif ((monthData["yearMonth"]) != (int((datetime.datetime.now()).strftime("%Y%m")))):
             monthCollection.delete_one(monthData)
+    
+    async def dailyValidation(userIdentity):
+        dailyData = dailyCollection.find_one(
+            {"_id": userIdentity}, {"_id": 0, "yearMonthDay": 1})
+
+        # Checks if the user has studied in the day.
+        if dailyData is None:
+            pass
+
+        # Checks if the day is outdated and will delete it from the database.
+        elif ((dailyData["yearMonthDay"]) != (int((datetime.datetime.now()).strftime("%Y%m%d")))):
+            dailyCollection.delete_one(dailyData)
 
     async def allTimeInsertion(userIdentity, timeStudied):
 
@@ -151,9 +175,29 @@ class Database(commands.Cog):
             # Updates the new amount studied.
             newResult = {"$set": {"monthStudyTime": updatedAmountStudied}}
             monthCollection.update_one(result, newResult)
-
+            
     async def dailyInsertion(userIdentity, timeStudied):
-        pass
+        await Database.dailyValidation(userIdentity)
+
+        collection = dailyCollection.find_one({"_id": userIdentity})
+
+        #Gets current day, month and year from the date time (Ex: 20220811)
+        yearMonthDay = int((datetime.datetime.now()).strftime("%Y%m%d"))
+
+        if collection == None:
+            document = {"_id": userIdentity,
+                        "dailyStudyTime": timeStudied, "yearMonthDay": yearMonthDay}
+            dailyCollection.insert_one(document)
+
+        # Document exists.
+        else:
+            result = dailyCollection.find_one(
+                {"_id": userIdentity}, {"_id": 0, "dailyStudyTime": 1})
+            # Calculates new total amount studied.    
+            updatedAmountStudied = result["dailyStudyTime"] + timeStudied
+            # Updates the new amount studied.
+            newResult = {"$set": {"dailyStudyTime": updatedAmountStudied}}
+            dailyCollection.update_one(result, newResult)
 
     async def databaseControl(userIdentity, timeStudied):
         await Database.allTimeInsertion(userIdentity, timeStudied)
@@ -166,8 +210,9 @@ class Database(commands.Cog):
         allTime = await Database.allTimeStatistics(userIdentity)
         yearTime = await Database.yearStatistics(userIdentity)
         monthTime = await Database.monthStatistics(userIdentity)
+        dailyTime = await Database.dailyStatistics(userIdentity)
 
-        return allTime, yearTime, monthTime
+        return allTime, yearTime, monthTime, dailyTime
 
 
 def setup(bot):
