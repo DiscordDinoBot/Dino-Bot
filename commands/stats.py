@@ -1,6 +1,5 @@
 from nextcord import Interaction
 import nextcord
-import datetime
 from nextcord.ext import commands
 from database.database import Database
 from helpers.userInterface import UserInterface

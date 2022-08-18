@@ -1,6 +1,7 @@
 import os
 import json
 import datetime
+import pytz
 from pymongo import MongoClient
 from nextcord.ext import commands
 
@@ -23,6 +24,7 @@ else:
 class Database(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        Database.pst = pytz.timezone('America/Los_Angeles')
 
     async def allTimeStatistics(userIdentity):
         allTimeData = allTimeCollection.find_one(
@@ -41,7 +43,7 @@ class Database(commands.Cog):
             {"_id": userIdentity}, {"_id": 0, "year": 1})
 
         # Checks if the user has studied in the past year.
-        if (yearData is None) or ((yearData["year"]) != (int((datetime.datetime.now()).strftime("%Y")))):
+        if (yearData is None) or ((yearData["year"]) != (int((datetime.datetime.now(Database.pst)).strftime("%Y")))):
             return 0
 
         # Returns the amount of time the user has studied in the year.
@@ -53,7 +55,7 @@ class Database(commands.Cog):
             {"_id": userIdentity}, {"_id": 0, "yearMonth": 1})
 
         # Checks if the user has studied in the past month.
-        if (monthData is None) or ((monthData["yearMonth"]) != (int((datetime.datetime.now()).strftime("%Y%m")))):
+        if (monthData is None) or ((monthData["yearMonth"]) != (int((datetime.datetime.now(Database.pst)).strftime("%Y%m")))):
             return 0
 
         # Returns the amount of time the user has studied in the month.
@@ -65,7 +67,7 @@ class Database(commands.Cog):
             {"_id": userIdentity}, {"_id": 0, "yearMonthDay": 1})
 
         # Checks if the user has studied in the past day.
-        if (dailyData is None) or ((dailyData["yearMonthDay"]) != (int((datetime.datetime.now()).strftime("%Y%m%d")))):
+        if (dailyData is None) or ((dailyData["yearMonthDay"]) != (int((datetime.datetime.now(Database.pst)).strftime("%Y%m%d")))):
             return 0
 
         # Returns the amount of time the user has studied in the day.
@@ -81,7 +83,7 @@ class Database(commands.Cog):
             pass
 
         # Checks if the year is outdated and will delete it from the database.
-        elif ((yearData["year"]) != (int((datetime.datetime.now()).strftime("%Y")))):
+        elif ((yearData["year"]) != (int((datetime.datetime.now(Database.pst)).strftime("%Y")))):
             yearCollection.delete_one(yearData)
 
     async def monthValidation(userIdentity):
@@ -93,7 +95,7 @@ class Database(commands.Cog):
             pass
 
         # Checks if the month is outdated and will delete it from the database.
-        elif ((monthData["yearMonth"]) != (int((datetime.datetime.now()).strftime("%Y%m")))):
+        elif ((monthData["yearMonth"]) != (int((datetime.datetime.now(Database.pst)).strftime("%Y%m")))):
             monthCollection.delete_one(monthData)
     
     async def dailyValidation(userIdentity):
@@ -105,7 +107,7 @@ class Database(commands.Cog):
             pass
 
         # Checks if the day is outdated and will delete it from the database.
-        elif ((dailyData["yearMonthDay"]) != (int((datetime.datetime.now()).strftime("%Y%m%d")))):
+        elif ((dailyData["yearMonthDay"]) != (int((datetime.datetime.now(Database.pst)).strftime("%Y%m%d")))):
             dailyCollection.delete_one(dailyData)
 
     async def allTimeInsertion(userIdentity, timeStudied):
@@ -133,7 +135,7 @@ class Database(commands.Cog):
 
         collection = yearCollection.find_one({"_id": userIdentity})
         # Getting current year.
-        year = int((datetime.datetime.now()).strftime("%Y"))
+        year = int((datetime.datetime.now(Database.pst)).strftime("%Y"))
 
         # Checks if the document is empty. If it is empty then we add a document for it.
         if collection == None:
@@ -159,7 +161,7 @@ class Database(commands.Cog):
         collection = monthCollection.find_one({"_id": userIdentity})
 
         #Gets current month and year from the date time (Ex: 202208)
-        yearMonth = int((datetime.datetime.now()).strftime("%Y%m"))
+        yearMonth = int((datetime.datetime.now(Database.pst)).strftime("%Y%m"))
 
         if collection == None:
             document = {"_id": userIdentity,
@@ -182,7 +184,7 @@ class Database(commands.Cog):
         collection = dailyCollection.find_one({"_id": userIdentity})
 
         #Gets current day, month and year from the date time (Ex: 20220811)
-        yearMonthDay = int((datetime.datetime.now()).strftime("%Y%m%d"))
+        yearMonthDay = int((datetime.datetime.now(Database.pst)).strftime("%Y%m%d"))
 
         if collection == None:
             document = {"_id": userIdentity,

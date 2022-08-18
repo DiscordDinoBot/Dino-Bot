@@ -1,6 +1,8 @@
 import os
 import nextcord
 import json
+import datetime
+import pytz
 from nextcord.ext import commands
 
 intents = nextcord.Intents.all()
@@ -53,7 +55,13 @@ async def on_ready():
 # Checks if the user is a owner.
 @commands.is_owner()
 async def version(ctx):
-    await ctx.send("Dino Bot is running on version **0.6.0 (Beta)**")
+    await ctx.send("Dino Bot is running on version **0.6.1 (Beta)**")
+
+# Checking what time the bot is running on.
+@bot.command()
+@commands.is_owner()
+async def time(ctx):
+    await ctx.send(f"Dino Bot is running on **{(datetime.datetime.now(pytz.timezone('America/Los_Angeles')))}**")
 
 # Loads a specific cog.
 @bot.command()

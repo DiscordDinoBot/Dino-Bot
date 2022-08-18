@@ -21,7 +21,7 @@ class Help(commands.Cog):
 
         )
 
-        embed.add_field(name="Commands", value="`/stats` Displays the amount of time the user has studied (EDT Time).\
+        embed.add_field(name="Commands", value="`/stats` Displays the amount of time the user has studied (PST Time).\
             \n`/study` Initiates the study session and opens the session menu. \
             \n`/timer` Creates a timer for the user and opens a timer selection menu.",inline="False")
 
