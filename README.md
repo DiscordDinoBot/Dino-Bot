@@ -1,4 +1,4 @@
-<img src="https://lh3.googleusercontent.com/-ZY7yGtfLZHlGU9uE77mxhLGe3Baj4kvseVxcZmZNSlzULXxsgNVD9QR1_pjXktHRoSBwBxb6rrimLDmbi7ADEXpfsh8rldWNPx-8hdPHjzmESt_1uKS53pJjebNvwGDSBoIpfkADA=s311-p-k" width=180 align="right" />
+<img src="https://drive.google.com/uc?export=view&id=1IGTdzN5wzdYgAHxDXg63kbIhXMYNf_7x" width=180 align="right" />
 
 # Dino Bot 
 > Best Discord bot for having focused study sessions.
