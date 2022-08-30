@@ -8,6 +8,7 @@ class UserInterface(commands.Cog):
 
     async def getFinishDisplayDescription(totalTime):
 
+        # Calculates the Seconds, Minutes and Hours for the messsages.
         totalMinute, totalSecond = divmod(totalTime, 60)
 
         totalHour, totalMinute = divmod(totalMinute, 60)
@@ -194,6 +195,7 @@ class UserInterface(commands.Cog):
         return displayDescription
 
     async def getDisplayTitle(sessionState):
+        # Checks the session state and assigns the title to the correct session.
         if (sessionState) == 7:
             displayTitle = "Long Break"
 
@@ -206,6 +208,7 @@ class UserInterface(commands.Cog):
         return displayTitle
 
     async def getDisplayColour(sessionState):
+        # Checks the session state and assigns the colour to the correct session.
         if (sessionState == 7):
             red = 8
             green = 54

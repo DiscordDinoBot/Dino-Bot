@@ -15,6 +15,7 @@ class PomodoroInput(commands.Cog):
         PomodoroInput.pomodoroCustomInputFile = PomodoroCustomInput(bot)
         PomodoroInput.VerificationFile = Verification(bot)
 
+        #Dictionary for the selection menu message so we can delete it at the end.
         PomodoroInput.selectionMenuMessage = {}
     
     @nextcord.slash_command(description="Create a Pomodoro session for studying.")
@@ -26,7 +27,9 @@ class PomodoroInput(commands.Cog):
             await interaction.response.send_message("You have an active session. Please check private messages to proceed.", ephemeral=True)
             return
 
+        # If the user is not in an active session we add them to the dictionary.
         await Verification.addUserVerification(interaction.user.id)
+        #Asking the user for the input and assigning the message so we can delete it later.
         PomodoroInput.selectionMenuMessage[interaction.user.id] = await interaction.user.send("Please choose a selection", view=DropdownView(timeout=None))
         await interaction.response.send_message("Your session has been sent in a private message.", ephemeral=True)
 
@@ -34,6 +37,8 @@ class DropdownView(nextcord.ui.View):
     @nextcord.ui.select(
 
         placeholder='Select a studying time.',
+
+        # Allows only one value to be selected.
         min_values=1,
         max_values=1,
 

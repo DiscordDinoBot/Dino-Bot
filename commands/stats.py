@@ -12,13 +12,14 @@ class Stats(commands.Cog):
     @nextcord.slash_command(description="Showcases the amount of time that you have studied.")
     async def stats(self, interaction: Interaction):
 
+        # Gets the amount of time studied for a range of time from the database file.
         totalTimeStudied, yearTimeStudied, monthTimeStudied, dailyTimeStudied = await Database.databaseReceiving(interaction.user.id)
 
+        # Uses the value in seconds and grabs the correct message from the user interface file.
         totalTimeStudiedMessage = (await UserInterface.getFinishDisplayDescription(totalTimeStudied)).strip("You completed of studying.").replace("*", "")
         yearTimeStudiedMessage = (await UserInterface.getFinishDisplayDescription(yearTimeStudied)).strip("You completed of studying.").replace("*", "")
         monthTimeStudiedMessage = (await UserInterface.getFinishDisplayDescription(monthTimeStudied)).strip("You completed of studying.").replace("*", "")
         dailyTimeStudiedMessage = (await UserInterface.getFinishDisplayDescription(dailyTimeStudied)).strip("You completed of studying.").replace("*", "")
-
 
         embed = nextcord.Embed(
 
@@ -28,6 +29,7 @@ class Stats(commands.Cog):
 
         )
 
+        # Adds all the previous messages to the field to be shown to the user.
         embed.add_field(name="Time Ranges", value=(f"\
         **Today**: {dailyTimeStudiedMessage}\n \
         **This Month**: {monthTimeStudiedMessage}\n \

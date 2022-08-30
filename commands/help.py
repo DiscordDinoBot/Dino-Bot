@@ -2,14 +2,12 @@ import nextcord
 from nextcord.ext import commands
 from nextcord import Interaction
 
-# Custom Help command that can display instructions for the user
-
 
 class Help(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # Command that runs the content for the help command
+    # Command that runs the content for the help command.
     @nextcord.slash_command(description="Provides instructions on how to use the bot.")
     async def help(self, interaction: Interaction):
 
@@ -21,11 +19,13 @@ class Help(commands.Cog):
 
         )
 
+        # Fields that are added to the main embed above this comment.
         embed.add_field(name="Commands", value="`/stats` Displays the amount of time the user has studied (PST Time).\
             \n`/study` Initiates the study session and opens the session menu. \
-            \n`/timer` Creates a timer for the user and opens a timer selection menu.",inline="False")
+            \n`/timer` Creates a timer for the user and opens a timer selection menu.", inline="False")
 
-        embed.add_field(name="Information", value="Check out the [website](https://dinosaurbot.com) to learn more!")
+        embed.add_field(
+            name="Information", value="Check out the [website](https://dinosaurbot.com) to learn more!")
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 

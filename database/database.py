@@ -10,6 +10,8 @@ if os.path.exists(os.getcwd() + "/config.json"):
     with open("./config.json") as x:
         configData = json.load(x)
 
+    # Accessing the MongoDB database and collection
+    # Accessing the DATABASEPASSWORD from Config.json
     cluster = MongoClient(configData["DATABASEPASSWORD"])
     db = cluster["DinoBot"]
     allTimeCollection = db["studyData"]
@@ -24,9 +26,11 @@ else:
 class Database(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        # Setting the variable "pst" to the PST time zone.
         Database.pst = pytz.timezone('America/Los_Angeles')
 
     async def allTimeStatistics(userIdentity):
+        # Gets the date from the all time collection
         allTimeData = allTimeCollection.find_one(
             {"_id": userIdentity}, {"_id": 0, "studyTime": 1})
 
@@ -39,6 +43,7 @@ class Database(commands.Cog):
             return((allTimeCollection.find_one({"_id": userIdentity}, {"_id": 0, "studyTime": 1}))["studyTime"])
 
     async def yearStatistics(userIdentity):
+        # Gets the date from the year collection
         yearData = yearCollection.find_one(
             {"_id": userIdentity}, {"_id": 0, "year": 1})
 
@@ -51,6 +56,7 @@ class Database(commands.Cog):
             return((yearCollection.find_one({"_id": userIdentity}, {"_id": 0, "yearStudyTime": 1}))["yearStudyTime"])
 
     async def monthStatistics(userIdentity):
+        # Gets the date from the month collection
         monthData = monthCollection.find_one(
             {"_id": userIdentity}, {"_id": 0, "yearMonth": 1})
 
@@ -63,6 +69,7 @@ class Database(commands.Cog):
             return((monthCollection.find_one({"_id": userIdentity}, {"_id": 0, "monthStudyTime": 1}))["monthStudyTime"])
 
     async def dailyStatistics(userIdentity):
+        # Gets the date from the daily collection
         dailyData = dailyCollection.find_one(
             {"_id": userIdentity}, {"_id": 0, "yearMonthDay": 1})
 
@@ -97,7 +104,7 @@ class Database(commands.Cog):
         # Checks if the month is outdated and will delete it from the database.
         elif ((monthData["yearMonth"]) != (int((datetime.datetime.now(Database.pst)).strftime("%Y%m")))):
             monthCollection.delete_one(monthData)
-    
+
     async def dailyValidation(userIdentity):
         dailyData = dailyCollection.find_one(
             {"_id": userIdentity}, {"_id": 0, "yearMonthDay": 1})
@@ -125,6 +132,7 @@ class Database(commands.Cog):
             result = allTimeCollection.find_one(
                 {"_id": userIdentity}, {"_id": 0, "studyTime": 1})
             updatedAmountStudied = result["studyTime"] + timeStudied
+            # Updates the new amount studied.
             newResult = {"$set": {"studyTime": updatedAmountStudied}}
             allTimeCollection.update_one(result, newResult)
 
@@ -150,17 +158,16 @@ class Database(commands.Cog):
 
             # Calculates new total amount studied.
             updatedAmountStudied = result["yearStudyTime"] + timeStudied
-
-            # Updates the new amount studied.
             newResult = {"$set": {"yearStudyTime": updatedAmountStudied}}
             yearCollection.update_one(result, newResult)
 
     async def monthInsertion(userIdentity, timeStudied):
+        # Runs the validation file for the month to check if the time has expired.
         await Database.monthValidation(userIdentity)
 
         collection = monthCollection.find_one({"_id": userIdentity})
 
-        #Gets current month and year from the date time (Ex: 202208)
+        # Gets current month and year from the date time (Ex: 202208)
         yearMonth = int((datetime.datetime.now(Database.pst)).strftime("%Y%m"))
 
         if collection == None:
@@ -172,19 +179,20 @@ class Database(commands.Cog):
         else:
             result = monthCollection.find_one(
                 {"_id": userIdentity}, {"_id": 0, "monthStudyTime": 1})
-            # Calculates new total amount studied.    
+            # Calculates new total amount studied.
             updatedAmountStudied = result["monthStudyTime"] + timeStudied
-            # Updates the new amount studied.
             newResult = {"$set": {"monthStudyTime": updatedAmountStudied}}
             monthCollection.update_one(result, newResult)
-            
+
     async def dailyInsertion(userIdentity, timeStudied):
+        # Runs the validation file for the daily to check if the time has expired.
         await Database.dailyValidation(userIdentity)
 
         collection = dailyCollection.find_one({"_id": userIdentity})
 
-        #Gets current day, month and year from the date time (Ex: 20220811)
-        yearMonthDay = int((datetime.datetime.now(Database.pst)).strftime("%Y%m%d"))
+        # Gets current day, month and year from the date time (Ex: 20220811)
+        yearMonthDay = int(
+            (datetime.datetime.now(Database.pst)).strftime("%Y%m%d"))
 
         if collection == None:
             document = {"_id": userIdentity,
@@ -195,25 +203,27 @@ class Database(commands.Cog):
         else:
             result = dailyCollection.find_one(
                 {"_id": userIdentity}, {"_id": 0, "dailyStudyTime": 1})
-            # Calculates new total amount studied.    
+            # Calculates new total amount studied.
             updatedAmountStudied = result["dailyStudyTime"] + timeStudied
             # Updates the new amount studied.
             newResult = {"$set": {"dailyStudyTime": updatedAmountStudied}}
             dailyCollection.update_one(result, newResult)
 
     async def databaseControl(userIdentity, timeStudied):
+        # Runs all the insertion functions for the user.
         await Database.allTimeInsertion(userIdentity, timeStudied)
         await Database.yearInsertion(userIdentity, timeStudied)
         await Database.monthInsertion(userIdentity, timeStudied)
         await Database.dailyInsertion(userIdentity, timeStudied)
 
     async def databaseReceiving(userIdentity):
-
+        # Collects all the times from the statistics functions.
         allTime = await Database.allTimeStatistics(userIdentity)
         yearTime = await Database.yearStatistics(userIdentity)
         monthTime = await Database.monthStatistics(userIdentity)
         dailyTime = await Database.dailyStatistics(userIdentity)
 
+        # Returns all the times from the above variables.
         return allTime, yearTime, monthTime, dailyTime
 
 

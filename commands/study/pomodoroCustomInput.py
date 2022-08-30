@@ -9,6 +9,7 @@ class PomodoroCustomInput(commands.Cog):
         PomodoroCustomInput.bot = bot
         PomodoroCustomInput.pomodoroClockFile = PomodoroClock(bot)
 
+        # Creating dictionaries for the inputs from the user.
         customSelectionMenuMessage = {}
         customSelectionState = {}
         studyTime = {}
@@ -19,13 +20,16 @@ class PomodoroCustomInput(commands.Cog):
         PomodoroCustomInput.studyTime = studyTime
         PomodoroCustomInput.breakTime = breakTime
 
+    # Function that runs the study message for the input.
     async def pomodoroStudyCustomInput(self, user, userIdentity):
         PomodoroCustomInput.customSelectionState[userIdentity] = 0
         PomodoroCustomInput.customSelectionMenuMessage[userIdentity] = await user.send("Choose a **Study** session duration", view=DropdownView(timeout=None))
 
+    # Function that runs the break message for the input.
     async def pomodoroBreakCustomInput(self, user, userIdentity):
         PomodoroCustomInput.customSelectionMenuMessage[userIdentity] = await user.send("Choose a **Break** session duration", view=DropdownView(timeout=None))
 
+    # Function that runs the long break message for the input.
     async def pomodoroLongBreakCustomInput(self, user, userIdentity):
         PomodoroCustomInput.customSelectionMenuMessage[userIdentity] = await user.send("Choose a **Long Break** session duration", view=DropdownView(timeout=None))
 
@@ -35,9 +39,12 @@ class DropdownView(nextcord.ui.View):
     @nextcord.ui.select(
 
         placeholder="Select a session time",
+        
+        # Allows only one value to be selected.
         min_values=1,
         max_values=1,
 
+        # All the options range from 5 minutes in time. Repeats for each selection.
         options=[
 
             nextcord.SelectOption(
@@ -171,8 +178,8 @@ class DropdownView(nextcord.ui.View):
 
             # Deletes previous message
             await PomodoroCustomInput.customSelectionMenuMessage[interaction.user.id].delete()
-            
-            #Deletes the data from the dictionaries to save space
+
+            # Deletes the data from the dictionaries to save space
             del PomodoroCustomInput.customSelectionMenuMessage[interaction.user.id]
             del PomodoroCustomInput.customSelectionState[interaction.user.id]
             del PomodoroCustomInput.studyTime[interaction.user.id]
@@ -181,8 +188,6 @@ class DropdownView(nextcord.ui.View):
             # Runs the pomodoro clock file with the session times collected
             await PomodoroCustomInput.pomodoroClockFile.setPomodoro(pomodoroTime, shortBreak, longBreak, interaction.user, interaction.user.id)
             await PomodoroCustomInput.pomodoroClockFile.runPomodoro(interaction.user, interaction.user.id)
-
-
 
 
 def setup(bot):
