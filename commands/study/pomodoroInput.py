@@ -15,23 +15,35 @@ class PomodoroInput(commands.Cog):
         PomodoroInput.pomodoroCustomInputFile = PomodoroCustomInput(bot)
         PomodoroInput.VerificationFile = Verification(bot)
 
-        #Dictionary for the selection menu message so we can delete it at the end.
+        # Dictionary for the selection menu message so we can delete it at the end.
         PomodoroInput.selectionMenuMessage = {}
-    
+
     @nextcord.slash_command(description="Create a Pomodoro session for studying.")
     async def study(self, interaction: Interaction):
-    
-        # If the user is in an active session, we will stop the function from continuing.
+        
+        #Checks if the user has an active session
         if (interaction.user.id) in Verification.sessionActive:
-            await Verification.verificationResponse(self, interaction.user, interaction.user.id)
-            await interaction.response.send_message("You have an active session. Please check private messages to proceed.", ephemeral=True)
+            #If the message is not in a private channel we must send it secretly (Ephemeral)
+            if (interaction.channel.type is not nextcord.ChannelType.private):
+                await interaction.response.send_message("You have an active session. Please finish the session to proceed.", ephemeral=True)
+            #Message is sent in private channel therefore we send it not ephemeral.
+            else:
+                await interaction.response.send_message("You have an active session. Please finish the session to proceed.")
+            #Stops the function from continuing so we dont start the session.
             return
 
         # If the user is not in an active session we add them to the dictionary.
         await Verification.addUserVerification(interaction.user.id)
-        #Asking the user for the input and assigning the message so we can delete it later.
-        PomodoroInput.selectionMenuMessage[interaction.user.id] = await interaction.user.send("Please choose a selection", view=DropdownView(timeout=None))
-        await interaction.response.send_message("Your session has been sent in a private message.", ephemeral=True)
+
+        #Checks if the channel is not a private channel.
+        if (interaction.channel.type is not nextcord.ChannelType.private):
+            #We send a secret message alongside the selection menu.
+            PomodoroInput.selectionMenuMessage[interaction.user.id] = await interaction.user.send("Please choose a selection", view=DropdownView(timeout=None))
+            await interaction.response.send_message("Your session has been sent in a private message.", ephemeral=True)
+        
+        #Channel is private so we do not need to notify the user with a secret message.
+        else:
+            PomodoroInput.selectionMenuMessage[interaction.user.id] = await interaction.response.send_message("Please choose a selection", view=DropdownView(timeout=None))
 
 class DropdownView(nextcord.ui.View):
     @nextcord.ui.select(
@@ -127,10 +139,10 @@ class DropdownView(nextcord.ui.View):
             shortBreak = 300
             longBreak = 900
 
-        #Removes the message from Discord
+        # Removes the message from Discord
         await PomodoroInput.selectionMenuMessage[interaction.user.id].delete()
 
-        #Removes the message from the Dictionary
+        # Removes the message from the Dictionary
         del PomodoroInput.selectionMenuMessage[interaction.user.id]
 
         # This will run the cancel selection for the menu.

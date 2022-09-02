@@ -55,7 +55,7 @@ async def on_ready():
 # Checks if the user is a owner.
 @commands.is_owner()
 async def version(ctx):
-    await ctx.send("Dino Bot is running on version **0.6.2 (Beta)**")
+    await ctx.send("Dino Bot is running on version **0.6.3 (Beta)**")
 
 # Checking what time the bot is running on.
 @bot.command()

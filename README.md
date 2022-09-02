@@ -36,7 +36,7 @@ This is for anyone who would like to use the code or contribute. Anyone is welco
  
 ``{"TOKEN": ""`` Insert your bot token into the ``""``
  
-``, "DATABASEPASSWORD": ""}`` insert your MongoDB Connection string into the ``""`` \
+``, "DATABASEPASSWORD": ""}`` insert your MongoDB Connection string into the ``""`` 
  
 4. You must make 4 collections in your MongoDB database. You can name them the same that the bot uses which would require no change on the code. If you do however change the names then the code for the database is provided in the **database.py**.
 \
