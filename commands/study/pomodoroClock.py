@@ -249,11 +249,6 @@ class PomodoroClock(commands.Cog):
     async def runPomodoro(self, user, userIdentity):
         await self.controlPomodoro(user, userIdentity)
 
-    async def verificationEndSession(self, user, userIdentity):
-        if (PomodoroClock.pauseState[userIdentity] == True):
-            await PomodoroClock.pomodoroMessage[userIdentity].delete()
-            await PomodoroClock.finishPomodoro(self, user, userIdentity)
 
-# Setup function
 def setup(bot):
     bot.add_cog(PomodoroClock(bot))

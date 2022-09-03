@@ -39,7 +39,7 @@ class DropdownView(nextcord.ui.View):
     @nextcord.ui.select(
 
         placeholder="Select a session time",
-        
+
         # Allows only one value to be selected.
         min_values=1,
         max_values=1,

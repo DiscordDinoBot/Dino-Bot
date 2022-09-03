@@ -15,35 +15,23 @@ class TimerInput(commands.Cog):
         TimerInput.timerSelectionMenuMessage = timerSelectionMenuMessage
 
         TimerInput.timerFile = Timer(bot)
-        TimerInput.VerificationFile = Verification(bot)
 
     @nextcord.slash_command(description="Create a timer for studying.")
     async def timer(self, interaction: Interaction):
-        #Checks if the user has an active session
+        # Checks if the user has an active session.
         if (interaction.user.id) in Verification.sessionActive:
-            #If the message is not in a private channel we must send it secretly (Ephemeral)
-            if (interaction.channel.type is not nextcord.ChannelType.private):
-                await interaction.response.send_message("You have an active session. Please finish the session to proceed.", ephemeral=True)
-            #Message is sent in private channel therefore we send it not ephemeral.
-            else:
-                await interaction.response.send_message("You have an active session. Please finish the session to proceed.")
-            #Stops the function from continuing so we dont start the session.
+            # Sends an ephermeral message to the user incase they are in a server.
+            await interaction.response.send_message("You have an active session. Please finish the session to proceed.", ephemeral=True)
             return
 
-        # If the user is not in an active session we add them to the dictionary.
+        # Adds the user to the active user dictionary.
         await Verification.addUserVerification(interaction.user.id)
+        # Assigns the message to the dictionary so we can access the message later in the file.
+        TimerInput.timerSelectionMenuMessage[interaction.user.id] = await interaction.user.send("Please choose a selection", view=DropdownView(timeout=None))
+        # Sends an ephermeral message to the user incase they are in a server.
+        await interaction.response.send_message("Your session has been sent in a private message.", ephemeral=True)
 
-        #Checks if the channel is not a private channel.
-        if (interaction.channel.type is not nextcord.ChannelType.private):
-            #We send a secret message alongside the selection menu.
-            TimerInput.timerSelectionMenuMessage[interaction.user.id] = await interaction.user.send("Please choose a selection", view=DropdownView(timeout=None))
-            await interaction.response.send_message("Your session has been sent in a private message.", ephemeral=True)
-        
-        #Channel is private so we do not need to notify the user with a secret message.
-        else:
-            TimerInput.timerSelectionMenuMessage[interaction.user.id] = await interaction.response.send_message("Please choose a selection", view=DropdownView(timeout=None))
 
-    
 class DropdownView(nextcord.ui.View):
 
     @nextcord.ui.select(

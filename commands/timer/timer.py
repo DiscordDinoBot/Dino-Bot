@@ -41,7 +41,7 @@ class Timer(commands.Cog):
 
         while (timeSeconds > 0) and (Timer.finishState[userIdentity] == False) and (Timer.pauseState[userIdentity] == False):
             await sleep(1)
-            
+
             # Checks if a minute has passed. If this is true we must update the display of the timer.
             if ((timeSeconds % 60) == 0):
                 displayDescription = await UserInterface.getDisplayDescription(timeSeconds)
@@ -53,22 +53,22 @@ class Timer(commands.Cog):
             timeSeconds -= 1
 
         try:
-            #Deletes the timer message.
+            # Deletes the timer message.
             await Timer.timerMessage[userIdentity].delete()
 
         except (nextcord.errors.NotFound):
             pass
 
-        #Calculates how much time has passed and adds it to variables.
+        # Calculates how much time has passed and adds it to variables.
         timeStudied = initialSeconds - timeSeconds
         Timer.timeStudied[userIdentity] += timeStudied
         Timer.timeRemaining[userIdentity] = timeSeconds
-        
-        #Checks if the timer is finished.
+
+        # Checks if the timer is finished.
         if (Timer.finishState[userIdentity] == True) or (timeSeconds <= 0):
             await Timer.timerFinish(user, userIdentity)
 
-        #If the timer is not finished then it got paused.
+        # If the timer is not finished then it got paused.
         else:
             await Timer.timerPause(user, userIdentity)
 
@@ -78,8 +78,8 @@ class Timer(commands.Cog):
         Timer.timerMessage[userIdentity] = await user.send(view=TimerButtons.timerPausedView, embed=embed)
 
     async def timerFinish(user, userIdentity):
-        
-        #Takes the amount of time that got studied and assigns it.
+
+        # Takes the amount of time that got studied and assigns it.
         timeSeconds = Timer.timeStudied[userIdentity]
         # Grabbing the description for the message with the amount of time the user studied.
         finishDisplayDescription = await UserInterface.getFinishDisplayDescription(timeSeconds)
@@ -88,21 +88,22 @@ class Timer(commands.Cog):
 
         embed = nextcord.Embed(title=(f"Finished Session ({studyDate})"), description=(
             finishDisplayDescription), colour=nextcord.Colour.from_rgb(74, 189, 100))
-        
+
         await user.send(embed=embed)
 
         from helpers.verification import Verification
 
-        #Removing the user and adding the time to the database.
+        # Removing the user and adding the time to the database.
         await Verification.removeUserVerification(userIdentity)
         await Database.databaseControl(userIdentity, timeSeconds)
-        
-        #Deleteing the users values so we can save space.
+
+        # Deleteing the users values so we can save space.
         del Timer.timerMessage[userIdentity]
         del Timer.finishState[userIdentity]
         del Timer.pauseState[userIdentity]
         del Timer.timeStudied[userIdentity]
         del Timer.timeRemaining[userIdentity]
+
 
 class TimerButtons():
     def __init__(self, bot):
@@ -110,13 +111,13 @@ class TimerButtons():
 
     async def setTimerButtons(self):
 
-        #Setting the buttons to variables.
+        # Setting the buttons to variables.
         finishButton = Button(label="Finish",
                               style=ButtonStyle.green)
         pauseButton = Button(label="Pause", style=ButtonStyle.red)
         resumeButton = Button(label="Resume", style=ButtonStyle.green)
 
-        #Creating the views.
+        # Creating the views.
         TimerButtons.timerButtonView = View()
         TimerButtons.timerButtonView.add_item(finishButton)
         TimerButtons.timerButtonView.add_item(pauseButton)

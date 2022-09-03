@@ -4,7 +4,6 @@ import json
 import datetime
 import pytz
 from nextcord.ext import commands
-
 intents = nextcord.Intents.all()
 intents.message_content = True
 
@@ -55,7 +54,7 @@ async def on_ready():
 # Checks if the user is a owner.
 @commands.is_owner()
 async def version(ctx):
-    await ctx.send("Dino Bot is running on version **0.6.3 (Beta)**")
+    await ctx.send("Dino Bot is running on version **1.0.0 (Release)**")
 
 # Checking what time the bot is running on.
 @bot.command()
