@@ -36,13 +36,13 @@ class PomodoroClock(commands.Cog):
         resumeButton = Button(label="Resume", style=ButtonStyle.green)
 
         # Button View for any active sessions.
-        PomodoroClock.activeSessionButtons = View()
+        PomodoroClock.activeSessionButtons = View(timeout=None)
         PomodoroClock.activeSessionButtons.add_item(finishButton)
         PomodoroClock.activeSessionButtons.add_item(pauseButton)
         PomodoroClock.activeSessionButtons.add_item(skipButton)
 
         # Button View for any paused sessions.
-        PomodoroClock.pausedSessionButtons = View()
+        PomodoroClock.pausedSessionButtons = View(timeout=None)
         PomodoroClock.pausedSessionButtons.add_item(resumeButton)
 
         # Response functions.

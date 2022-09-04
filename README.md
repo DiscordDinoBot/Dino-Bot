@@ -11,7 +11,7 @@ Dino Bot is a discord bot that will create study sessions that increase focus. T
  
 ## Setup
  
-1. Use the invite link at [dinosaurbot.com/invite](https://www.dinosaurbot.com/invite).
+1. Use the invite link at [dinosaurbot.com](https://www.dinosaurbot.com).
 2. Add the bot to the server.
 3. Use **Slash Commands** and start using the bot!
  

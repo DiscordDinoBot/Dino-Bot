@@ -118,11 +118,11 @@ class TimerButtons():
         resumeButton = Button(label="Resume", style=ButtonStyle.green)
 
         # Creating the views.
-        TimerButtons.timerButtonView = View()
+        TimerButtons.timerButtonView = View(timeout=None)
         TimerButtons.timerButtonView.add_item(finishButton)
         TimerButtons.timerButtonView.add_item(pauseButton)
 
-        TimerButtons.timerPausedView = View()
+        TimerButtons.timerPausedView = View(timeout=None)
         TimerButtons.timerPausedView.add_item(resumeButton)
 
         # Response functions.
