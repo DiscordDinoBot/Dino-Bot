@@ -5,6 +5,9 @@ import datetime
 import pytz
 from nextcord.ext import commands
 
+intents = nextcord.Intents.all()
+intents.message_content = True
+
 '''
 This runs the config JSON file. This will not be included
 on our GitHub Repostiory since it includes the token for our bot.
@@ -33,11 +36,10 @@ else:
         json.dump(configTemplate, x)
 
 # Setting the prefix for the bot. "!"
-bot = commands.Bot(command_prefix="!")
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Removes default help command so we can access our own custom one.
 bot.remove_command('help')
-
 
 # This will run once the bot is booted up.
 @bot.event
@@ -52,7 +54,7 @@ async def on_ready():
 # Checks if the user is a owner.
 @commands.is_owner()
 async def version(ctx):
-    await ctx.send("Dino Bot is running on version **1.0.1**")
+    await ctx.send("Dino Bot is running on version **1.0.2**")
 
 # Checking what time the bot is running on.
 @bot.command()

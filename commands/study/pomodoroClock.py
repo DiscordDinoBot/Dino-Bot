@@ -1,5 +1,6 @@
 import nextcord
 import asyncio
+from datetime import datetime
 from nextcord import ButtonStyle
 from nextcord.ui import Button, View
 from nextcord.ext import commands
@@ -135,6 +136,7 @@ class PomodoroClock(commands.Cog):
             PomodoroClock.pauseState[userIdentity] = False
             PomodoroClock.resumeState[userIdentity] = False
             timeSeconds = PomodoroClock.timeRemaining[userIdentity]
+            await PomodoroClock.setClockPomodoro(user, userIdentity, timeSeconds)
             await PomodoroClock.clockPomodoro(self, user, userIdentity, timeSeconds)
 
         # Checks if user has paused the session
@@ -148,20 +150,23 @@ class PomodoroClock(commands.Cog):
         # Checks if the user wants to run a study session
         elif (PomodoroClock.sessionState[userIdentity]) in (0, 2, 4, 6):
             timeSeconds = await PomodoroClock.getStudyTime(self, userIdentity)
+            await PomodoroClock.setClockPomodoro(user, userIdentity, timeSeconds)
             await PomodoroClock.clockPomodoro(self, user, userIdentity, timeSeconds)
 
         # Checks if user wants to run a break session
         elif (PomodoroClock.sessionState[userIdentity]) in (1, 3, 5):
             timeSeconds = await PomodoroClock.getBreakTime(self, userIdentity)
+            await PomodoroClock.setClockPomodoro(user, userIdentity, timeSeconds)
             await PomodoroClock.clockPomodoro(self, user, userIdentity, timeSeconds)
 
         # Checks if user wants to run a long break session
         elif (PomodoroClock.sessionState[userIdentity]) == 7:
             timeSeconds = await PomodoroClock.getLongBreakTime(self, userIdentity)
+            await PomodoroClock.setClockPomodoro(user, userIdentity, timeSeconds)
             await PomodoroClock.clockPomodoro(self, user, userIdentity, timeSeconds)
 
-    async def clockPomodoro(self, user, userIdentity, timeSeconds):
 
+    async def setClockPomodoro(user, userIdentity, timeSeconds):
         # Following three variables all receive the UI from the UI file.
         red, green, blue = await UserInterface.getDisplayColour(PomodoroClock.sessionState[userIdentity])
         displayTitle = await UserInterface.getDisplayTitle(PomodoroClock.sessionState[userIdentity])
@@ -174,24 +179,30 @@ class PomodoroClock(commands.Cog):
         # Assigning the clock message to a variable so we can delete it when the clock is finished or paused.
         PomodoroClock.pomodoroMessage[userIdentity] = await user.send(view=PomodoroClock.activeSessionButtons, embed=embed)
 
+    async def clockMessagePomodoro(timeSeconds, userIdentity):
+        # Checks if a minute has passed. If this is true we must update the display of the clock.
+        if ((timeSeconds % 60) == 0):
+            red, green, blue = await UserInterface.getDisplayColour(PomodoroClock.sessionState[userIdentity])
+            displayTitle = await UserInterface.getDisplayTitle(PomodoroClock.sessionState[userIdentity])
+            displayDescription = await UserInterface.getDisplayDescription(timeSeconds)
+
+            embed = nextcord.Embed(title=(f"{displayTitle} Session"), description=(
+                displayDescription), colour=nextcord.Colour.from_rgb(red, green, blue))
+            await PomodoroClock.pomodoroMessage[userIdentity].edit(view=PomodoroClock.activeSessionButtons, embed=embed)
+
+    async def clockPomodoro(self, user, userIdentity, timeSeconds):
+
         # Keeping track of the initalTime so we can see how much time elasped.
         initialSeconds = timeSeconds
 
         while (timeSeconds > 0) and (PomodoroClock.pauseState[userIdentity] == False) and (PomodoroClock.finishState[userIdentity] == False) and (PomodoroClock.skipState[userIdentity] == False):
-            await asyncio.sleep(1)
-
-            # Checks if a minute has passed. If this is true we must update the display of the clock.
-            if ((timeSeconds % 60) == 0):
-                red, green, blue = await UserInterface.getDisplayColour(PomodoroClock.sessionState[userIdentity])
-                displayTitle = await UserInterface.getDisplayTitle(PomodoroClock.sessionState[userIdentity])
-                displayDescription = await UserInterface.getDisplayDescription(timeSeconds)
-
-                embed = nextcord.Embed(title=(f"{displayTitle} Session"), description=(
-                    displayDescription), colour=nextcord.Colour.from_rgb(red, green, blue))
-                await PomodoroClock.pomodoroMessage[userIdentity].edit(view=PomodoroClock.activeSessionButtons, embed=embed)
-
+            await asyncio.gather(
+                asyncio.sleep(1),
+                PomodoroClock.clockMessagePomodoro(timeSeconds, userIdentity)
+            )
+            
             timeSeconds -= 1
-
+        
         # Checks if the session state was a study state. If True we add the time to the studied variable.
         if (PomodoroClock.sessionState[userIdentity]) in (0, 2, 4, 6):
             timeStudied = initialSeconds - timeSeconds

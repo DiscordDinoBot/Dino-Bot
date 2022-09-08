@@ -152,6 +152,7 @@ class DropdownView(nextcord.ui.View):
 
         # Setup for the timer and then runs the timer.
         await TimerInput.timerFile.timerSet(interaction.user.id)
+        await TimerInput.timerFile.timerMessageSet(interaction.user, interaction.user.id, timerAmount)
         await TimerInput.timerFile.timerClock(interaction.user, interaction.user.id, timerAmount)
 
 

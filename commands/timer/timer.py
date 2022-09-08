@@ -1,4 +1,5 @@
 import nextcord
+import asyncio
 from datetime import date
 from nextcord import ButtonStyle
 from nextcord.ui import Button, View
@@ -22,12 +23,12 @@ class Timer(commands.Cog):
 
     async def timerSet(self, userIdentity):
         await TimerButtons.setTimerButtons(self)
-
+    
         Timer.timeStudied[userIdentity] = 0
         Timer.finishState[userIdentity] = False
         Timer.pauseState[userIdentity] = False
 
-    async def timerClock(self, user, userIdentity, timeSeconds):
+    async def timerMessageSet(self, user, userIdentity, timeSeconds):
         displayDescription = await UserInterface.getDisplayDescription(timeSeconds)
         # Setting up the embed for the timer message.
         embed = nextcord.Embed(title=(f"Timer"), description=(
@@ -36,20 +37,26 @@ class Timer(commands.Cog):
         # Assigning the timer message to a variable so we can delete it when the timer is finished or paused.
         Timer.timerMessage[userIdentity] = await user.send(view=TimerButtons.timerButtonView, embed=embed)
 
+    async def timerMessageEdit(timeSeconds, userIdentity):
+        # Checks if a minute has passed. If this is true we must update the display of the timer.
+        if ((timeSeconds % 60) == 0):
+            displayDescription = await UserInterface.getDisplayDescription(timeSeconds)
+
+            embed = nextcord.Embed(title=(f"Timer"), description=(
+                displayDescription), colour=nextcord.Colour.from_rgb(196, 138, 51))
+            await Timer.timerMessage[userIdentity].edit(view=TimerButtons.timerButtonView, embed=embed)
+
+    async def timerClock(self, user, userIdentity, timeSeconds):
+    
         # Keeping track of the initalTime so we can see how much time elasped.
         initialSeconds = timeSeconds
 
         while (timeSeconds > 0) and (Timer.finishState[userIdentity] == False) and (Timer.pauseState[userIdentity] == False):
-            await sleep(1)
-
-            # Checks if a minute has passed. If this is true we must update the display of the timer.
-            if ((timeSeconds % 60) == 0):
-                displayDescription = await UserInterface.getDisplayDescription(timeSeconds)
-
-                embed = nextcord.Embed(title=(f"Timer"), description=(
-                    displayDescription), colour=nextcord.Colour.from_rgb(196, 138, 51))
-                await Timer.timerMessage[userIdentity].edit(view=TimerButtons.timerButtonView, embed=embed)
-
+            await asyncio.gather(
+                asyncio.sleep(1),
+                Timer.timerMessageEdit(timeSeconds, userIdentity)
+            )
+            
             timeSeconds -= 1
 
         try:
@@ -143,6 +150,7 @@ class TimerButtons():
         await Timer.timerMessage[interaction.user.id].delete()
         timeSeconds = Timer.timeRemaining[interaction.user.id]
         Timer.pauseState[interaction.user.id] = False
+        await Timer.timerMessageSet(interaction, interaction.user, interaction.user.id, timeSeconds)
         await Timer.timerClock(interaction, interaction.user, interaction.user.id, timeSeconds)
 
 
