@@ -4,7 +4,7 @@ The use of this application ("Bot") in a server requires the collection of some 
 
 ## Access to Data
 
-Access to Data is only permitted to Bot's developer, and only in the scope required for the development, testing, and implementation of features for Bot. Data is not sold, provided to, or shared with any third party, except where required by law or a Terms of Service agreement. You can view the data upon request from [`@brezden`](https://github.com/brezden) by using the [Discord Server](https://discord.gg/C6msPjySah).
+Access to Data is only permitted to Bot's developer, and only in the scope required for the development, testing, and implementation of features for Bot. Data is not sold, provided to, or shared with any third party, except where required by law or a Terms of Service agreement. You can view the data upon request from [`@brezden`](https://github.com/brezden) by using the [Discord Server](https://discord.gg/jtTCcRpDdC).
 
 ## Storage of Data
 
@@ -20,7 +20,7 @@ studyDate: 20220913
 
 ## User Rights
 
-At any time, you have the right to request to view the Data pertaining to your Discord account. You may submit a request through the [Discord Server](https://discord.gg/C6msPjySah). You have the right to request the removal of relevant Data.
+At any time, you have the right to request to view the Data pertaining to your Discord account. You may submit a request through the [Discord Server](https://discord.gg/jtTCcRpDdC). You have the right to request the removal of relevant Data.
 
 ## Underage Users
 
